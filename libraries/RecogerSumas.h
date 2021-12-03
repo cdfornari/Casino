@@ -1,20 +1,10 @@
 #include<iostream>
 #include<cmath>
+#include <iomanip>
+#include <stdlib.h>
+#include "Casino.h"
 
 using namespace std;
-
-//Funcion que imprime una sola carta
-void imprimirCarta(Carta carta){
-     if(carta.representacion == '-'){
-            cout << carta.valor;
-            imprimirFigura(carta);
-            cout << setw(4);
-        }else{
-            cout << carta.representacion;
-            imprimirFigura(carta);
-            cout << setw(4);
-        }
-}
 
 //Funcion que retorna la cantidad de cartas que hay en un mazo. Considera un emparejamiento como una carta.
 int sumaMazo(Nodo *lista){ 

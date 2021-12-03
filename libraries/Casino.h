@@ -1,3 +1,4 @@
+#include "ConsoleUI.h"
 #include <iostream>
 #include <iomanip>
 #include <stdlib.h>
@@ -227,10 +228,6 @@ void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Cart
     }
 }
 
-void seleccionarMovimiento(Nodo *mesa, Nodo *cartasJugador){
-
-}
-
 int contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora, int clarezasJugador, int clarezasComputadora){
     int puntajeJugador = clarezasJugador;
     int contadorCartasJugador = 0;
@@ -294,17 +291,22 @@ void imprimirFigura (Carta carta){
     }
 }
 
+//Funcion que imprime una sola carta
+void imprimirCarta(Carta carta){
+    if(carta.representacion == '-'){
+        cout << carta.valor;
+        imprimirFigura(carta);
+        cout << setw(4);
+    }else{
+        cout << carta.representacion;
+        imprimirFigura(carta);
+        cout << setw(4);
+    }
+}
+
 void imprimirMazo(Nodo *mazo){
     while(mazo != NULL){
-        if(mazo->carta.representacion == '-'){
-            cout << mazo->carta.valor;
-            imprimirFigura(mazo->carta);
-            cout << setw(4);
-        }else{
-            cout << mazo->carta.representacion;
-            imprimirFigura(mazo->carta);
-            cout << setw(4);
-        }
+        imprimirCarta(mazo->carta);
         mazo = mazo->siguiente; 
     }
     cout << endl;
@@ -346,6 +348,91 @@ void imprimirEmparejamientos(Nodo *mesa){
         cout << "Emparejamiento 2:\n";
         imprimirMazo(emparejamiento2);
     }
+}
+
+void imprimirCartasPorPosicion(Nodo *cartasJugador){
+    int *contador = new int(1);
+    while(cartasJugador != NULL){
+        cout << *contador << setw(2);
+        imprimirCarta(cartasJugador->carta);
+        cartasJugador = cartasJugador->siguiente;
+        (*contador)++; 
+    }
+    delete contador;
+}
+
+short int SeleccionarCartaPorPosicion(Nodo *cartasJugador, short int contadorCartasJugador, bool isMac){
+    short int cartaSeleccionada;
+    do
+    {
+        limpiarConsola(isMac);
+        cout << "¿Que carta desea lanzar?" << endl;
+        imprimirCartasPorPosicion(cartasJugador);
+        cin >> cartaSeleccionada;
+        while(cin.fail()){
+            cout << "Error - Vuelva a ingresar posicion (numero)" << endl;
+            cin.clear();
+            cin.ignore(256,'\n');
+            cin >> cartaSeleccionada;
+        }
+        if (cartaSeleccionada < 1 || cartaSeleccionada > contadorCartasJugador){
+            cout << "Selecciona una posición correcta" << endl;
+            pausarConsola();
+        }
+    } while (cartaSeleccionada < 1 || cartaSeleccionada > contadorCartasJugador);
+    return cartaSeleccionada;
+}
+
+Carta buscarCartaPorPosicion(Nodo *cartasJugador, short int posicionABuscar){
+    short int posicion = 1;
+    if (posicionABuscar == 1)
+        return cartasJugador->carta;
+    while (posicion < posicionABuscar && cartasJugador != NULL)
+        cartasJugador = cartasJugador->siguiente;
+    return cartasJugador->carta;
+}
+
+void seleccionarMovimiento(Nodo *&mesa, Nodo *&cartasJugador, short int contadorCartasJugador, bool isMac){
+    char *opcionSeleccionada = new char;
+    bool *movimientoValido= new bool(false);
+    short int posicion;
+    Carta cartaSeleccionada;
+    do
+    {
+        limpiarConsola(isMac);
+        cout << "Cartas en la mesa:\n";
+        imprimirMazo(mesa);
+        imprimirEmparejamientos(mesa);
+        cout << "¿Que jugada quiere realizar?" << endl;
+        cout << "1. Lanzar carta en mesa" << endl;
+        cout << "2. Emparejar carta" << endl;
+        cout << "3. Recoger carta o emparejamiento" << endl;
+        cout << "4. Doblar o proteger emparejamiento" << endl;
+        *opcionSeleccionada = seleccionarOpcion();
+        switch (*opcionSeleccionada)
+        {
+            case '1':
+                posicion = SeleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador,isMac);
+                cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicion);
+                lanzarCartaEnMesa(mesa, cartasJugador, cartaSeleccionada);
+            break;
+            case '2':
+                
+            break;
+            case '3':
+                
+            break;
+            case '4':
+                
+            break;
+            default:
+                cout << "Seleccione una opcion correcta\n";
+            break;
+        }
+        pausarConsola();
+    } while (!*movimientoValido);
+    delete movimientoValido;
+    delete opcionSeleccionada;
 }
 
 //Funcion que retorna un jugador dependiendo del turno. Para usarlo en parametros, se puede dereferenciar la funcion con *

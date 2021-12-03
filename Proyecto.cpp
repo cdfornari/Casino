@@ -1,7 +1,7 @@
 #include <iostream>
 #include <time.h>
 #include "libraries/Casino.h"
-#include "libraries/ConsoleUI.h"
+
 using namespace std;
 
 typedef struct {
@@ -23,6 +23,7 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
     bool isMac = seleccionarSistemaOperativo();
     char opcionSeleccionada;
     short int reparte;
+    short int contadorCartasJugador;
     do
     {
         limpiarConsola(isMac);
@@ -43,20 +44,17 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
                 do
                 {
                     repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
+                    contadorCartasJugador = 4;
                     do
                     {
-                        cout << "Cartas en la mesa:\n";
-                        imprimirMazo(cartasMesa);
-                        imprimirEmparejamientos(cartasMesa);
                         if(reparte == 0){
-                            seleccionarMovimiento(cartasMesa,computadora.cartasMazo);
-                            seleccionarMovimiento(cartasMesa,jugador.cartasMazo);
+                            //seleccionarMovimiento(cartasMesa,computadora.cartasMazo);
+                            seleccionarMovimiento(cartasMesa,jugador.cartasMazo,contadorCartasJugador,isMac);
                         }else{
-                            seleccionarMovimiento(cartasMesa,jugador.cartasMazo);
-                            seleccionarMovimiento(cartasMesa,computadora.cartasMazo);
+                            seleccionarMovimiento(cartasMesa,jugador.cartasMazo,contadorCartasJugador,isMac);
+                            //seleccionarMovimiento(cartasMesa,computadora.cartasMazo);
                         }
-                        cout << "Tus cartas:\n";
-                        imprimirMazo(jugador.cartasMazo);
+                        contadorCartasJugador--;
                         pausarConsola();
                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                 } while (mazo != NULL);
