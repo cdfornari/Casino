@@ -353,7 +353,7 @@ void imprimirEmparejamientos(Nodo *mesa){
 void imprimirCartasPorPosicion(Nodo *cartasJugador){
     int *contador = new int(1);
     while(cartasJugador != NULL){
-        cout << *contador << setw(2);
+        cout << *contador << "." << setw(2);
         imprimirCarta(cartasJugador->carta);
         cartasJugador = cartasJugador->siguiente;
         (*contador)++; 
@@ -366,8 +366,9 @@ short int SeleccionarCartaPorPosicion(Nodo *cartasJugador, short int contadorCar
     do
     {
         limpiarConsola(isMac);
-        cout << "¿Que carta desea lanzar?" << endl;
+        cout << "Que carta desea lanzar?" << endl;
         imprimirCartasPorPosicion(cartasJugador);
+        cout << endl;
         cin >> cartaSeleccionada;
         while(cin.fail()){
             cout << "Error - Vuelva a ingresar posicion (numero)" << endl;
@@ -387,8 +388,11 @@ Carta buscarCartaPorPosicion(Nodo *cartasJugador, short int posicionABuscar){
     short int posicion = 1;
     if (posicionABuscar == 1)
         return cartasJugador->carta;
-    while (posicion < posicionABuscar && cartasJugador != NULL)
-        cartasJugador = cartasJugador->siguiente;
+    else
+        while (posicion < posicionABuscar && cartasJugador != NULL){
+            cartasJugador = cartasJugador->siguiente;
+            posicion++;
+        }
     return cartasJugador->carta;
 }
 
@@ -400,10 +404,12 @@ void seleccionarMovimiento(Nodo *&mesa, Nodo *&cartasJugador, short int contador
     do
     {
         limpiarConsola(isMac);
+        cout << "Tus cartas:`\n";
+        imprimirMazo(cartasJugador);
         cout << "Cartas en la mesa:\n";
         imprimirMazo(mesa);
         imprimirEmparejamientos(mesa);
-        cout << "¿Que jugada quiere realizar?" << endl;
+        cout << "Que jugada quiere realizar?" << endl;
         cout << "1. Lanzar carta en mesa" << endl;
         cout << "2. Emparejar carta" << endl;
         cout << "3. Recoger carta o emparejamiento" << endl;
@@ -415,6 +421,7 @@ void seleccionarMovimiento(Nodo *&mesa, Nodo *&cartasJugador, short int contador
                 posicion = SeleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador,isMac);
                 cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicion);
                 lanzarCartaEnMesa(mesa, cartasJugador, cartaSeleccionada);
+                *movimientoValido = true;
             break;
             case '2':
                 
