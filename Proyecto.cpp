@@ -6,16 +6,16 @@ using namespace std;
 
 Nodo *mazo = NULL;
 Nodo *cartasMesa = NULL;
-Jugador *jugador;
-Jugador *computadora;
+Jugador jugador;
+Jugador computadora;
 
 int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
-    jugador->cartasMazo = NULL;
-    jugador->clarezas = 0;
-    jugador->idEmparejamiento = 0;
-    computadora->cartasMazo = NULL;
-    computadora->clarezas = 0;
-    computadora->idEmparejamiento = 0;
+    jugador.cartasMazo = NULL;
+    jugador.clarezas = 0;
+    jugador.idEmparejamiento = 0;
+    computadora.cartasMazo = NULL;
+    computadora.clarezas = 0;
+    computadora.idEmparejamiento = 0;
     bool isMac = seleccionarSistemaOperativo();
     char opcionSeleccionada;
     short int reparte;
@@ -41,22 +41,21 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
                     limpiarConsola(isMac);
                 do
                 {
-                    repartirCartas(mazo,jugador->cartasMazo,computadora->cartasMazo);
+                    repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
                     contadorCartasJugador = 4;
                     do
                     {
                         if(reparte == 0){
                             //mueve comp
-                            seleccionarMovimiento(jugador,computadora,cartasMesa,jugador->cartasMazo,jugador->cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
+                            seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
                         }else{
-                            seleccionarMovimiento(jugador,computadora,cartasMesa,jugador->cartasMazo,jugador->cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
+                            seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
                             //mueve comp
                         }
                         contadorCartasJugador--;
-                        pausarConsola();
-                    } while (jugador->cartasMazo != NULL || computadora->cartasMazo!= NULL);
+                    } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                 } while (mazo != NULL);
-                contarPuntaje(jugador->cartasRecogidas,computadora->cartasRecogidas,jugador->clarezas,computadora->clarezas);
+                contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
             break;
             case '2':
                 cout << "COMING SOON\n";
@@ -67,11 +66,11 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
                 srand(time(0));
                 barajear(mazo);
                 imprimirMazo(mazo);
-                repartirCartas(mazo,jugador->cartasMazo,computadora->cartasMazo);
+                repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
                 cout << "Jugador" << endl;
-                imprimirMazo(jugador->cartasMazo);
+                imprimirMazo(jugador.cartasMazo);
                 cout << "Computadora" << endl;
-                imprimirMazo(computadora->cartasMazo);
+                imprimirMazo(computadora.cartasMazo);
                 cout << "mazo despues de repartir" << endl;
                 imprimirMazo(mazo);
             break;

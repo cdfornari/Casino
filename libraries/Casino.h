@@ -12,7 +12,6 @@ typedef struct {
     char representacion;
     short int puntaje;
     int idEmparejamiento;
-    short int contadorEmparejadas;
     short int sumaEmparejadas;
     bool doblada;
 }Carta;
@@ -82,7 +81,6 @@ Carta generarCarta(){
         carta.puntaje = 0;
     }
     carta.idEmparejamiento = 0;
-    carta.contadorEmparejadas = 0;
     carta.sumaEmparejadas = 0;
     carta.doblada = false;
     return carta;
@@ -107,6 +105,7 @@ int contarCartas(Nodo *mazo){
         contador++;
         mazo = mazo->siguiente;
     }
+    return contador;
 }
 
 void eliminarCartaDeMazo(Nodo *&mazo, Carta carta){
@@ -197,18 +196,18 @@ void lanzarCartaEnMesa(Nodo *&mesa, Nodo *&mazoJugador, Carta carta){
 
 void recogerCartaDeMesa(Nodo *&mesa, Nodo *&recogidas,Nodo *&mazoJugador, Carta cartaRecogiendo, Carta cartaRecogida){
     if(cartaRecogida.idEmparejamiento == 0){
-        insertarCartaEnMazo(recogidas,cartaRecogiendo);
         insertarCartaEnMazo(recogidas,cartaRecogida);
         eliminarCartaDeMazo(mesa,cartaRecogida);
+        insertarCartaEnMazo(recogidas,cartaRecogiendo);
         eliminarCartaDeMazo(mazoJugador,cartaRecogiendo);
     }else{
         insertarCartaEnMazo(recogidas,cartaRecogida);
-        insertarCartaEnMazo(recogidas,cartaRecogiendo);
         eliminarCartaDeMazo(mesa,cartaRecogida);
+        insertarCartaEnMazo(recogidas,cartaRecogiendo);
         eliminarCartaDeMazo(mazoJugador,cartaRecogiendo);
         int *contador = new int(0);
         Carta carta; 
-        while (*contador < cartaRecogida.contadorEmparejadas && buscarCartaEnMazoPorIdEmparejamiento(mesa,cartaRecogida.idEmparejamiento).valor != NULL)
+        while (buscarCartaEnMazoPorIdEmparejamiento(mesa,cartaRecogida.idEmparejamiento).valor != NULL)
         {
             carta = buscarCartaEnMazoPorIdEmparejamiento(mesa,cartaRecogida.idEmparejamiento);
             insertarCartaEnMazo(recogidas,carta);
@@ -250,7 +249,6 @@ void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Cart
             }    
             auxiliar = auxiliar->siguiente;
         }
-        auxiliar = mesa;
     }else{
         while (auxiliar != NULL){
             if (auxiliar->carta.valor == cartaAEmparejar.valor && auxiliar->carta.figura == cartaAEmparejar.figura){ //si es la carta a emparejar
@@ -264,16 +262,17 @@ void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Cart
     }
 }
 
-bool valorExisteEnEmparejamiento(Nodo *mesa,Carta cartaConLaQueSeEmpareja, int valor){
+bool valorExisteEnEmparejamiento(Nodo *mesa, int valor){
     while(mesa != NULL){
         if (mesa->carta.valor == valor)
             return true;
+        mesa = mesa->siguiente;
     }
     return false;
 }
 
 bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja, Nodo *mesa){
-    if(valorExisteEnEmparejamiento(mesa,cartaConLaQueSeEmpareja,cartaAEmparejar.valor)){
+    if(valorExisteEnEmparejamiento(mesa,cartaAEmparejar.valor)){
         cout << "No puedes emparejar, ya existe una carta con este valor en el emparejamiento" << endl << "Consejo: Intenta doblar" << endl;
         return false;
     }
@@ -362,13 +361,13 @@ void imprimirFigura (Carta carta){
 //Funcion que imprime una sola carta
 void imprimirCarta(Carta carta){
     if(carta.representacion == '-'){
+        
+        cout << carta.valor << setw(4);
         imprimirFigura(carta);
-        cout << carta.valor;
-        cout << setw(4);
     }else{
+        
+        cout << carta.representacion << setw(4);
         imprimirFigura(carta);
-        cout << carta.representacion;
-        cout << setw(4);
     }
 }
 
@@ -391,11 +390,11 @@ void imprimirEmparejamientos(Nodo *mesa){
             if(id1 == 0){
                 id1 = mesa->carta.idEmparejamiento;
                 insertarCartaEnMazo(emparejamiento1,mesa->carta);
+            }else if (mesa->carta.idEmparejamiento == id1){
+                insertarCartaEnMazo(emparejamiento1,mesa->carta);
             }else if(id2 == 0){
                 id2 = mesa->carta.idEmparejamiento;
                 insertarCartaEnMazo(emparejamiento2,mesa->carta);
-            }else if (mesa->carta.idEmparejamiento == id1){
-                insertarCartaEnMazo(emparejamiento1,mesa->carta);
             }else if (mesa->carta.idEmparejamiento == id2){
                 insertarCartaEnMazo(emparejamiento2,mesa->carta);
             }
@@ -443,7 +442,7 @@ short int seleccionarCartaPorPosicion(Nodo *cartas, short int contadorCartas){
             cin >> posicionSeleccionada;
         }
         if (posicionSeleccionada < 1 || posicionSeleccionada > contadorCartas){
-            cout << "Selecciona una posición correcta" << endl;
+            cout << "Selecciona una posicion correcta" << endl;
             pausarConsola();
         }
     } while (posicionSeleccionada < 1 || posicionSeleccionada > contadorCartas);
@@ -517,6 +516,8 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 cout << "Que carta desea recoger?" << endl;
                 *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
                 *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
+                imprimirCarta(cartaSeleccionada);
+                imprimirCarta(*cartaMesaSeleccionada);
                 if (cartaPuedeRecogerse(cartaSeleccionada,*cartaMesaSeleccionada,mesa))
                 {
                     if((*cartaMesaSeleccionada).idEmparejamiento != 0)
