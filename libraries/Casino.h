@@ -112,7 +112,7 @@ void eliminarCartaDeMazo(Nodo *&mazo, Carta carta){
     if(mazo != NULL){
         Nodo *auxiliar = mazo;
         Nodo *anterior = NULL;
-        while (auxiliar != NULL && auxiliar->carta.valor != carta.valor && auxiliar->carta.figura != carta.figura)
+        while (auxiliar != NULL && (auxiliar->carta.valor != carta.valor || auxiliar->carta.figura != carta.figura))
         {
             anterior = auxiliar;
             auxiliar = auxiliar -> siguiente;
@@ -516,8 +516,6 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 cout << "Que carta desea recoger?" << endl;
                 *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
                 *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
-                imprimirCarta(cartaSeleccionada);
-                imprimirCarta(*cartaMesaSeleccionada);
                 if (cartaPuedeRecogerse(cartaSeleccionada,*cartaMesaSeleccionada,mesa))
                 {
                     if((*cartaMesaSeleccionada).idEmparejamiento != 0)
