@@ -262,18 +262,9 @@ void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Cart
     }
 }
 
-bool valorExisteEnEmparejamiento(Nodo *mesa, int valor){
-    while(mesa != NULL){
-        if (mesa->carta.valor == valor)
-            return true;
-        mesa = mesa->siguiente;
-    }
-    return false;
-}
-
 bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja, Nodo *mesa){
-    if(valorExisteEnEmparejamiento(mesa,cartaAEmparejar.valor)){
-        cout << "No puedes emparejar, ya existe una carta con este valor en el emparejamiento" << endl << "Consejo: Intenta doblar" << endl;
+    if(cartaAEmparejar.valor == cartaConLaQueSeEmpareja.valor){
+        cout << "No puedes emparejar 2 cartas con el mismo valor" << endl;
         return false;
     }
     if (cartaAEmparejar.valor > 10 || cartaConLaQueSeEmpareja.valor > 10){
@@ -288,8 +279,36 @@ bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaCo
         cout << "No puedes sumar al emparejamiento. Esta protegido" << endl;
         return false;
     }
-    if(cartaAEmparejar.valor + cartaConLaQueSeEmpareja.sumaEmparejadas > 10){
-        cout << "No puedes emparejar, la suma del emparejamiento pasaría de 10" << endl;
+    if(cartaAEmparejar.valor + cartaConLaQueSeEmpareja.sumaEmparejadas > 10 || cartaAEmparejar.valor + cartaConLaQueSeEmpareja.valor > 10){
+        cout << "No puedes emparejar, la suma del emparejamiento pasaria de 10" << endl;
+        return false;
+    }
+    return true;
+}
+
+void doblarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla){
+    insertarCartaEnMazo(mesa,cartaADoblar);
+    eliminarCartaDeMazo(mazoJugador,cartaADoblar);
+    Nodo *auxiliar = mesa;
+    while (auxiliar != NULL){
+        if (auxiliar->carta.valor == cartaADoblar.valor && auxiliar->carta.figura == cartaADoblar.figura){ //si es la carta a doblar
+            auxiliar->carta.doblada = true;
+            auxiliar->carta.idEmparejamiento = cartaConLaQueSeDobla.idEmparejamiento;
+            auxiliar->carta.sumaEmparejadas = cartaConLaQueSeDobla.sumaEmparejadas;
+        }else if (auxiliar->carta.idEmparejamiento == cartaConLaQueSeDobla.idEmparejamiento){  //si forma parte del emparejamiento
+            auxiliar->carta.doblada = true; 
+        }
+        auxiliar = auxiliar->siguiente;
+    }
+}
+
+bool cartaPuedeDoblarse(Jugador jugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla, Nodo *mesa){
+    if(cartaConLaQueSeDobla.idEmparejamiento == 0){
+        cout << "La carta que quieres doblar no esta emparejada actualmente" << endl;
+        return false;
+    }
+    if(cartaADoblar.valor != cartaConLaQueSeDobla.sumaEmparejadas){
+        cout << "No puedes doblar. La carta no vale igual que la suma del emparejamiento" << endl;
         return false;
     }
     return true;
@@ -466,6 +485,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
     bool *movimientoValido= new bool(false);
     short int *posicionCartaDeMesa = new short int;
     Carta *cartaMesaSeleccionada = new Carta;
+    int cantidadCartasRecoger;
     short int posicionCartaSeleccionada;
     Carta cartaSeleccionada;
     do
@@ -479,7 +499,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
         cout << "Que jugada quiere realizar?" << endl;
         cout << "1. Lanzar carta en mesa" << endl;
         cout << "2. Emparejar carta" << endl;
-        cout << "3. Recoger carta o emparejamiento" << endl;
+        cout << "3. Recoger una carta o varias cartas o un emparejamiento" << endl;
         cout << "4. Doblar o proteger emparejamiento" << endl;
         *opcionSeleccionada = seleccionarOpcion();
         switch (*opcionSeleccionada)
@@ -513,22 +533,46 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 cout << "Que carta desea usar para recoger?" << endl;
                 posicionCartaSeleccionada = seleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador);
                 cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicionCartaSeleccionada);
-                cout << "Que carta desea recoger?" << endl;
-                *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
-                *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
-                if (cartaPuedeRecogerse(cartaSeleccionada,*cartaMesaSeleccionada,mesa))
+                cout << "Cuantas cartas desea recoger?" << endl;
+                do
                 {
-                    if((*cartaMesaSeleccionada).idEmparejamiento != 0)
-                        if((*cartaMesaSeleccionada).idEmparejamiento == (*jugador).idEmparejamiento)
-                            (*jugador).idEmparejamiento = 0;
-                        else
-                            (*computadora).idEmparejamiento = 0;
-                    recogerCartaDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
-                    *contadorCartasMesa = contarCartas(mesa);
-                    if(*contadorCartasMesa == 0)
-                        (*jugador).clarezas++;
-                    *movimientoValido = true;
+                    cin >> cantidadCartasRecoger;
+                    while(cin.fail()) {
+                        cout << "Error - Vuelva a ingresar numero" << endl;
+                        cin.clear();
+                        cin.ignore(256,'\n');
+                        cin >> cantidadCartasRecoger;
+                    }
+                } while (cantidadCartasRecoger < 1 || cantidadCartasRecoger > *contadorCartasMesa);
+                if (cantidadCartasRecoger == 1)
+                {
+                    cout << "Que carta desea recoger?" << endl;
+                    *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
+                    *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
+                    if (cartaPuedeRecogerse(cartaSeleccionada,*cartaMesaSeleccionada,mesa))
+                    {
+                        if((*cartaMesaSeleccionada).idEmparejamiento != 0)
+                            if((*cartaMesaSeleccionada).idEmparejamiento == (*jugador).idEmparejamiento)
+                                (*jugador).idEmparejamiento = 0;
+                            else
+                                (*computadora).idEmparejamiento = 0;
+                        recogerCartaDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
+                        *contadorCartasMesa = contarCartas(mesa);
+                        if(*contadorCartasMesa == 0)
+                            (*jugador).clarezas++;
+                        *movimientoValido = true;
+                    }
                 }
+                else
+                {
+                    for (int i = 0; i < cantidadCartasRecoger; i++)
+                    {
+                        
+                    }
+                    
+                }
+                
+                
             break;
             case '4':
                 cout << "Que carta desea usar para doblar?" << endl;
@@ -537,9 +581,9 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 cout << "Que carta desea doblar?" << endl;
                 *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
                 *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
-                if (true)
+                if (cartaPuedeDoblarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa))
                 {
-                    //doblar
+                    doblarCarta(mesa,jugador->cartasMazo,cartaSeleccionada,*cartaMesaSeleccionada);
                     *contadorCartasMesa = contarCartas(mesa);
                     *movimientoValido = true;
                 }
@@ -595,4 +639,15 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
 // void puntoDeClareza(bool cartaRecogida, Nodo *mesa, Jugador &jugador){ 
 //     if(mesa->siguiente==NULL)
 //     (cartaRecogida==true) ? ++jugador.clareza : jugador.clareza;
+// }
+
+// bool valorExisteEnEmparejamiento(Nodo *mesa, int valor, int idEmparejamiento){
+//     if(idEmparejamiento == 0)
+//         return false;
+//     while(mesa != NULL){
+//         if (mesa->carta.valor == valor && mesa->carta.idEmparejamiento == idEmparejamiento)
+//             return true;
+//         mesa = mesa->siguiente;
+//     }
+//     return false;
 // }
