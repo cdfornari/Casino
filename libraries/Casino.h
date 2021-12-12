@@ -642,15 +642,18 @@ void doblarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaADoblar, Carta cart
 }
 
 bool cartaPuedeDoblarse(Jugador jugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla, Nodo *mesa){
-    if(cartaConLaQueSeDobla.idEmparejamiento == 0 && cartaADoblar.valor != cartaConLaQueSeDobla.valor){
-        cout << "Para doblar con otra carta que no esta emparejada estas deben tener el mismo valor" << endl;
-        return false;
-    }
-    if(cartaADoblar.valor != cartaConLaQueSeDobla.sumaEmparejadas){
-        cout << "No puedes doblar. La carta no vale igual que la suma del emparejamiento" << endl;
-        return false;
-    }
-    return true;
+    if(cartaConLaQueSeDobla.idEmparejamiento == 0){
+        if(cartaADoblar.valor != cartaConLaQueSeDobla.valor){
+            cout << "Para doblar con otra carta que no esta emparejada estas deben tener el mismo valor" << endl;
+            return false;
+        }else
+            return true;
+    }else
+        if(cartaADoblar.valor != cartaConLaQueSeDobla.sumaEmparejadas){
+            cout << "No puedes doblar. La carta no vale igual que la suma del emparejamiento" << endl;
+            return false;
+        }else
+            return true;
 }
 
 int contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora, int clarezasJugador, int clarezasComputadora){
