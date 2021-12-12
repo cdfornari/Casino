@@ -1,5 +1,5 @@
 #include<iostream>
-#include"Casino.h"
+
 #include"RecogerSumas.h"
 
 //Busca una carta con mismo valor en un mazo
@@ -197,20 +197,18 @@ void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogida
     {
         switch (i)
         {
-        case 1:
+            case 1:
                 if(computadora.idEmparejamiento==0)
-                   emparejarComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
+                    emparejarComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
             break;
-        case 2:
+            case 2:
                 recogerCartas(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
             break;
-        case 3:
+            case 3:
                 doblarComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
             break;
-        case 4: 
+            default:
                 lanzarCarta(mesa,mazoComputadora,contadorCartasComputadora, contadorCartasMesa);
-            break;
-        default:
             break;
         }
         contadorCartasMesa=contarCartas(mesa);
