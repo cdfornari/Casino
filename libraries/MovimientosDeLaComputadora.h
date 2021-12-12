@@ -27,14 +27,14 @@ void recogerEspadas(Nodo *&mesa, Nodo *&recogidas, Nodo *&mazoComputadora, Jugad
         if(cartaDelMazo.valor!=-1){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa)){
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
-                //eliminarCartasRepetidasEnUnMazo
+                if(contarCartas(mesa)==0)
+                    ++computadora.clarezas;
                 movimientoRealizado=true;
                 break;
             }
         }      
     }
 }
-
 //Funcion que realiza todas las sumas posibles que puede recoger la computadora
 void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado){
     int suma=0, cantidadCartas=0;
@@ -117,13 +117,42 @@ void utilizarCadaCarta(Nodo *&mesa, Nodo *mazoJugador, Nodo *&recogidas, bool &m
         eliminarCartaDeMazo(mesa, mazoJugador->carta);
     }
 }
+//Funcion que recoge una carta igual
+void recogerUnaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora){
+    Nodo *auxiliar=mazoJugador;
+    Carta cartaRecogiendo;
+    Carta cartaQueSeRecoge;
+    while (auxiliar!=NULL){
+        cartaRecogiendo=auxiliar->carta;
+        Carta cartaQueSeRecoge=buscarCarta(mesa, cartaRecogiendo);
+        auxiliar=auxiliar->siguiente;
+        if(cartaQueSeRecoge.valor!=-1){
+            recogerCartaDeMesa(mesa, recogidas, mazoJugador, cartaRecogiendo, cartaQueSeRecoge);
+            movimientoRealizado=true;
+            if(contarCartas(mesa)==0)
+                ++computadora.clarezas;
+        }
+        if(movimientoRealizado) break;
+    }
+}
+//Recoger el emparejamiento de la computadora
+void recogerEmparejamientoComputadora(Nodo *&mesa, Nodo *&recogidas, Nodo *&mazoComputadora, bool &movimientoRealizado, Jugador &computadora){
+    Carta cartaQueSeRecoge=buscarCartaEnMazoPorIdEmparejamiento(mesa, computadora.idEmparejamiento);
+    Carta cartaABuscar;
+    cartaABuscar.valor=cartaQueSeRecoge.sumaEmparejadas;
+    Carta cartaRecogiendo=buscarCarta(mazoComputadora, cartaABuscar); //Busca la carta en el mazo de la compu el que tenga un valor igual a la suma 
+    recogerCartaDeMesa(mesa, recogidas, mazoComputadora, cartaRecogiendo, cartaQueSeRecoge);
+    movimientoRealizado=true;
+    computadora.idEmparejamiento==0;
+}
 //Todas las formas de recoger de la computadora
 void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora){
     for (int i = 1; i <=4; i++)
     {
         switch (i){
         case 1:
-              //recogerEmparejamiento();
+              if(computadora.idEmparejamiento!=0)
+              recogerEmparejamientoComputadora(mesa, recogidas, mazoComputadora, movimientoRealizado, computadora);
             break;
         case 2:
             recogerEspadas(mesa, recogidas,mazoComputadora, computadora, movimientoRealizado);
@@ -135,6 +164,7 @@ void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &
             recogerSumasComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado);
             break;      
         default:
+            recogerUnaCarta(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
             break;
         }    
 
@@ -147,17 +177,18 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
     Carta cartaMesaSeleccionada, cartaSeleccionada;
     for (int i = 1; i <= contarCartas(mazoComputadora); i++){
         cartaSeleccionada=buscarCartaPorPosicion(mazoComputadora,i);
-        for(int j=1; i<=contarCartas(mesa); j++){
+        for(int j=1; j<=contarCartas(mesa); j++){
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
             if (cartaPuedeEmparejarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa)){
+                //if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == (*jugador).idEmparejamiento) //Condicion para quitarle el emparejado al jugador
+                  //      (*jugador).idEmparejamiento = 0;
                 emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
                 computadora.idEmparejamiento==cartaMesaSeleccionada.idEmparejamiento;
                 movimientoRealizado=true;
                 break;
             }
         }
-        if(movimientoRealizado)
-            break;
+        if(movimientoRealizado)  break;
     }
 }
 //Doblar
@@ -165,7 +196,7 @@ void doblarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bo
     Carta cartaMesaSeleccionada, cartaSeleccionada;
     for (int i = 1; i <= contarCartas(mazoComputadora); i++){
         cartaSeleccionada=buscarCartaPorPosicion(mazoComputadora,i);
-        for(int j=1; i<=contarCartas(mesa); j++){
+        for(int j=1; j<=contarCartas(mesa); j++){
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
                  if (cartaPuedeDoblarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa)){
                      doblarCarta(mesa,mazoComputadora,cartaSeleccionada,cartaMesaSeleccionada);
@@ -173,8 +204,7 @@ void doblarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bo
                     break;
                  } 
         }
-        if(movimientoRealizado)
-            break;
+        if(movimientoRealizado) break;
     }
 }
 //Lanzar una carta
@@ -186,12 +216,11 @@ void lanzarCarta(Nodo *&mesa, Nodo *&cartasComputadora, short int contadorCartas
             do{   
           posicionCartaSeleccionada=rand() % 10;
         } while (posicionCartaSeleccionada < 1 || posicionCartaSeleccionada > contadorCartasComputadora);
-        posicionCartaSeleccionada = seleccionarCartaPorPosicion(cartasComputadora,contadorCartasComputadora);
         cartaSeleccionada = buscarCartaPorPosicion(cartasComputadora, posicionCartaSeleccionada);
     } while (cartaSeleccionada.valor>10 && contarCartas(cartasComputadora)>1 && contadorCartasMesa==0); //Guardando la figura para la ultima jugada
     lanzarCartaEnMesa(mesa, cartasComputadora, cartaSeleccionada);
 }
-void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int contadorCartasComputadora, short int &contadorCartasMesa, Jugador &computadora){
+void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int &contadorCartasComputadora, short int &contadorCartasMesa, Jugador &computadora){
     bool movimientoRealizado=false;
     for (int i = 1; i <=4 ; i++)
     {
