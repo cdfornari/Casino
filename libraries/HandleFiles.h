@@ -1,5 +1,6 @@
 #include<iostream>
-#include"libraries/Casino.h"
+#include"Casino.h"
+#include<string.h>
 #include<fstream>
 
 using namespace std;
@@ -9,11 +10,9 @@ const string nombreArchivo = "PartidaAnterior.txt"; //Para que no cambie el nomb
 ////////////////////////////////////////////////Vaciar en Archivo////////////////////////////////////////////////////////////////////////
 
 //Escribe en el archivo la informacion de un jugador 
-void vaciarJugador(Jugador jugador, ofstream &archivo){
-    archivo<<jugador.clarezas<<endl;
-    archivo<<jugador.idEmparejamiento<<endl;
-    archivo<<jugador.reparte<<endl;
-    archivo<<jugador.recogio<<endl;
+void vaciarJugador(Jugador *jugador, ofstream &archivo){
+    archivo<<jugador->clarezas<<endl;
+    archivo<<jugador->idEmparejamiento<<endl;
 }
 //Escribe en el archivo todo el contenido de una sola carta
 void vaciarCarta(Carta carta, ofstream &archivo){ 
@@ -26,7 +25,7 @@ void vaciarCarta(Carta carta, ofstream &archivo){
     archivo<<carta.doblada<<endl;
 }
 //Vacia en el archivo un jugador
-void vaciarJugadoresArchivo(Jugador jugador, bool &ok){
+void vaciarJugadoresArchivo(Jugador *jugador, bool &ok){
     ofstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::app);
     if(archivo.fail()){
@@ -52,6 +51,18 @@ void vaciarMazo(Nodo *mazo, bool &ok){
         archivo.close();
     }   
 }
+//Vacia las variable global booleana
+void vaciarVariableGlobal(bool variableGlobal, bool &ok){
+    ofstream archivo;
+    archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
+    if(archivo.fail()){
+       ok=false;
+    } else {
+        archivo<<variableGlobal<<endl; 
+        archivo<<"///"<<endl;                 //Separa cada variable con un ///
+        archivo.close();
+    }  
+}
 //Si el archivo ya tenia contenido, lo borra
 void borrarContenidoArchivo(bool &ok){ 
     ofstream archivo;
@@ -71,9 +82,14 @@ void vaciarLosMazos(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo
     vaciarMazo(mazo6, ok);
 }
 //Vacia toda la informacion de los jugadores en el archivo
-void vaciarLosJugadores(Jugador jugador, Jugador computadora, bool &ok){
+void vaciarLosJugadores(Jugador *jugador, Jugador *computadora, bool &ok){
     vaciarJugadoresArchivo(jugador, ok);
     vaciarJugadoresArchivo(computadora, ok);
+}
+
+void vaciarTodasVariablesGlobales(bool reparte, bool recogio, bool &ok){
+    vaciarVariableGlobal(recogio, ok);
+    vaciarVariableGlobal(reparte, ok);
 }
 
 ////////////////////////////////////////////////Cargar archivo////////////////////////////////////////////////////////////////////////
@@ -106,7 +122,7 @@ Figuras convertirFiguras(string linea){
     case '2':
             return corazon;
         break;
-    case '3':
+    default:
             return diamante;
         break;
     }
@@ -155,43 +171,49 @@ void cargarMazo(Nodo *&mazo, ifstream &archivo){
     }
 }
 //Funcion que crea al jugador leyendo cada linea del archivo
-void creandoJugador(Jugador &jugador, string linea, int contador){
+void creandoJugador(Jugador *&jugador, string linea, int contador){
     if(linea=="//") contador=10;
     switch (contador)
     {
     case 1:
-        jugador.clarezas=stoi(linea);
+        jugador->clarezas=stoi(linea);
         break;
     case 2:
-        jugador.idEmparejamiento=stoi(linea);
-    case 3:
-        (linea=="0") ? jugador.reparte=false : jugador.reparte=true; 
-    case 4:
-        (linea=="0") ? jugador.recogio=false : jugador.recogio=true; 
+        jugador->idEmparejamiento=stoi(linea);
     default:
         break;
     }
 }
 //Funcion que carga en el programa todo el contenido de un jugador
-void cargarJugador(Jugador &jugador, ifstream &archivo){
+void cargarJugador(Jugador *&jugador, ifstream &archivo){
     int contador=0;
     string linea="l";
+    jugador=new Jugador();
     while(!archivo.eof() && linea!="//"){
         ++contador;
         getline(archivo, linea);
         if(linea!="//")
             creandoJugador(jugador,linea,contador);
-        if(contador>=4)
+        if(contador>=2)
             contador=0;
     }
 }
+//Cargar variable global
+void cargarVariableGlobal(bool &variableGlobal, ifstream &archivo){
+    string linea="l";
+    while(!archivo.eof() && linea!="///"){
+        getline(archivo, linea);
+        (linea=="0") ? variableGlobal=false : variableGlobal=true;
+    }
+}
+
 //Funcion que carga los jugadores del juego
-void cargarVariosJugadores(Jugador &jugador, Jugador &computadora, ifstream &archivo){
+void cargarVariosJugadores(Jugador *&jugador, Jugador *&computadora, ifstream &archivo){
         cargarJugador(jugador, archivo);
         cargarJugador(computadora, archivo);
 }
 //Funcion que carga al programa principal todos los mazos necesarios y jugadores para reconstruir la partida anterior
-void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, Jugador &jugador, Jugador &computadora){ //Cargar todo de una vez
+void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, Jugador *&jugador, Jugador *&computadora, bool &recogio, bool &reparte){ //Cargar todo de una vez
     ifstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::in);
     if(archivo.fail()){
@@ -204,6 +226,8 @@ void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, N
         cargarMazo(mazo5, archivo);
         cargarMazo(mazo6, archivo);
         cargarVariosJugadores(jugador,computadora,archivo);
+        cargarVariableGlobal(recogio, archivo);
+        cargarVariableGlobal(reparte, archivo);
     }
     archivo.close();
 }
@@ -212,7 +236,6 @@ void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, N
 /////////////////////////////////////////////////////////TESTING////////////////////////////////////////////////////////////////////
 
 /*
-
 
 Carta crearCarta(int valor, Figuras figura, char representacion, int puntaje, int id, int suma, bool doblada){
     Carta carta;
@@ -227,8 +250,17 @@ Carta crearCarta(int valor, Figuras figura, char representacion, int puntaje, in
 }
 
 int main(){
+    Nodo *mazo=NULL;
+    Nodo *mesa=NULL;
+    Nodo *mazoJ=NULL;
+    Nodo *mazoC=NULL;
+    Nodo *mazoRC=NULL;
+    Nodo *mazoRJ=NULL;
+    Jugador *computadora=NULL;
+    Jugador *jugador=NULL;
     bool ok=false;
-    cargarInformacion(mazo,mesa,mazoJ,mazoRJ,mazoC,mazoRC,jugador,computadora);
+    bool recogio=false, reparte=false;
+    cargarInformacion(mazo,mesa,mazoJ,mazoRJ,mazoC,mazoRC,jugador,computadora,recogio,reparte);
     
     cout<<"Mazo"<<endl;
     imprimirMazo(mazo);
@@ -242,18 +274,33 @@ int main(){
     imprimirMazo(mazoC);
     cout<<"Mazo RC\n"<<endl;
     imprimirMazo(mazoRC);
-    cout<<"Jugador Clarezas"<<jugador.clarezas<<endl;
-    cout<<"Jugador id"<<jugador.idEmparejamiento<<endl;
-   cout<<"Compu Clarezas"<<computadora.clarezas<<endl;
-    cout<<"Compu id"<<computadora.idEmparejamiento<<endl;
+    cout<<"Jugador Clarezas"<<jugador->clarezas<<endl;
+    cout<<"Jugador id"<<jugador->idEmparejamiento<<endl;
+   cout<<"Compu Clarezas"<<computadora->clarezas<<endl;
+    cout<<"Compu id"<<computadora->idEmparejamiento<<endl;
+    cout<<"Recogio"<<recogio<<endl;
+    cout<<"Reparte"<<reparte<<endl;
 
     return 0;
 }
 
 
+*/
+
+
 /*
 
-  bool ok=false;
+int main(){
+    Nodo *mazo=NULL;
+    Nodo *mesa=NULL;
+    Nodo *mazoJ=NULL;
+    Nodo *mazoC=NULL;
+    Nodo *mazoRC=NULL;
+    Nodo *mazoRJ=NULL;
+    Jugador *computadora=new Jugador();
+    Jugador *jugador=new Jugador();
+
+    bool ok=false, reparte=true, recogio=false;
     borrarContenidoArchivo(ok);
     barajear(mazo);
     repartirAMesa(mazo, mesa);
@@ -264,10 +311,10 @@ int main(){
     repartirAMesa(mazo, mazoJ);
     repartirAMesa(mazo, mazoRC);
     repartirAMesa(mazo, mazoRJ);
-    computadora.idEmparejamiento=777;
-    computadora.clarezas=2;
-    jugador.idEmparejamiento=0;
-    jugador.clarezas=1;
+    computadora->idEmparejamiento=777;
+    computadora->clarezas=2;
+    jugador->idEmparejamiento=0;
+    jugador->clarezas=1;
 
     cout<<"Mazo"<<endl;
     imprimirMazo(mazo);
@@ -283,5 +330,7 @@ int main(){
     imprimirMazo(mazoRC);
     vaciarLosMazos(mazo,mesa,mazoJ,mazoRJ,mazoC, mazoRC,ok);
     vaciarLosJugadores(jugador,computadora,ok);
-
-    */
+    vaciarTodasVariablesGlobales(reparte, recogio, ok);
+    return 0;
+} 
+*/
