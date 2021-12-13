@@ -20,6 +20,7 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
     char opcionSeleccionada;
     short int reparte;
     short int contadorCartasJugador;
+    short int contadorCartasComputadora;
     short int *contadorCartasMesa = new short int;
     do
     {
@@ -43,16 +44,18 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
                 {
                     repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
                     contadorCartasJugador = 4;
+                    contadorCartasComputadora = 4;
                     do
                     {
                         if(reparte == 0){
-                            //mueve comp
+                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,&computadora);
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
                         }else{
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
-                            //mueve comp
+                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,&computadora);
                         }
                         contadorCartasJugador--;
+                        contadorCartasComputadora--;
                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                 } while (mazo != NULL);
                 contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
