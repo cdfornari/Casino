@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const string nombreArchivo = "PartidaAnterior.txt"; //Para que no cambie el nombre del archivo
+const string nombreArchivo = "db/PartidaAnterior.txt"; //Para que no cambie el nombre del archivo
 
 ////////////////////////////////////////////////Vaciar en Archivo////////////////////////////////////////////////////////////////////////
 
