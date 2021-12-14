@@ -25,31 +25,17 @@ void vaciarCarta(Carta carta, ofstream &archivo){
     archivo<<carta.doblada<<endl;
 }
 //Vacia en el archivo un jugador
-void vaciarJugadoresArchivo(Jugador jugador, bool &ok){
-    ofstream archivo;
-    archivo.open(nombreArchivo.c_str(), ios::app);
-    if(archivo.fail()){
-        ok=false;
-    } else {
+void vaciarJugadoresArchivo(Jugador jugador, ofstream &archivo, bool &ok){
         vaciarJugador(jugador, archivo);
         archivo<<"//"<<endl;                 //Separa cada jugador con un //
-        archivo.close();
-    }
 }
 //Vacia un mazo de cartas en el archivo
-void vaciarMazo(Nodo *mazo, bool &ok){  
-    ofstream archivo;
-    archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
-    if(archivo.fail()){
-       ok=false;
-    } else {
+void vaciarMazo(Nodo *mazo, ofstream &archivo, bool &ok){  
          while (mazo!=NULL){   
              vaciarCarta(mazo->carta, archivo);
              mazo=mazo->siguiente;
          }
         archivo<<"/"<<endl;                 //Separa cada mazo con un /
-        archivo.close();
-    }   
 }
 //Si el archivo ya tenia contenido, lo borra
 void borrarContenidoArchivo(bool &ok){ 
@@ -63,52 +49,44 @@ void borrarContenidoArchivo(bool &ok){
 //////////////////////////////Funciones a usar para vaciar la informacion/////////////////////////////////////////////////////////////////
 
 //Vacian todas las cartas en el archivo
-void vaciarLosMazos(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, bool &ok){ //Vaciar todo de una vez
-    vaciarMazo(mazo1, ok);
-    vaciarMazo(mazo2, ok);
-    vaciarMazo(mazo3, ok);
-    vaciarMazo(mazo4, ok);
-    vaciarMazo(mazo5, ok);
-    vaciarMazo(mazo6, ok);
+void vaciarLosMazos(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, ofstream &archivo, bool &ok){ //Vaciar todo de una vez
+    vaciarMazo(mazo1, archivo, ok);
+    vaciarMazo(mazo2, archivo, ok);
+    vaciarMazo(mazo3, archivo, ok);
+    vaciarMazo(mazo4, archivo, ok);
+    vaciarMazo(mazo5, archivo, ok);
+    vaciarMazo(mazo6, archivo, ok);
 }
 //Vacia toda la informacion de los jugadores en el archivo
-void vaciarLosJugadores(Jugador jugador, Jugador computadora, bool &ok){
-    vaciarJugadoresArchivo(jugador, ok);
-    vaciarJugadoresArchivo(computadora, ok);
+void vaciarLosJugadores(Jugador jugador, Jugador computadora, ofstream &archivo, bool &ok){
+    vaciarJugadoresArchivo(jugador, archivo, ok);
+    vaciarJugadoresArchivo(computadora, archivo, ok);
 }
 
 //Vacia las variable global booleana
-void vaciarReparte(short int reparte, bool &ok){
-    ofstream archivo;
-    archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
-    if(archivo.fail()){
-       ok=false;
-    } else {
+void vaciarReparte(short int reparte, ofstream &archivo, bool &ok){
         archivo<<reparte<<endl; 
         archivo<<"///"<<endl;                 //Separa cada variable con un ///
-        archivo.close();
-    }  
 }
 
-void vaciarUltimo(Ultimo ultimoRecogerOJugar, bool &ok){
+void vaciarUltimo(Ultimo ultimoRecogerOJugar, ofstream &archivo, bool &ok){
+        archivo<<ultimoRecogerOJugar<<endl; 
+        archivo<<"///"<<endl;                 //Separa cada variable con un ///
+}
+
+void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Nodo *&jugadorCartasMazo, Nodo *&jugadorCartasRecogidas, Nodo *&computadoraCartasMazo, Nodo*&computadoraCartasRecogidas, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){ 
     ofstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
     if(archivo.fail()){
        ok=false;
     } else {
-        archivo<<ultimoRecogerOJugar<<endl; 
-        archivo<<"///"<<endl;                 //Separa cada variable con un ///
-        archivo.close();
-    }  
-}
-
-void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Nodo *&jugadorCartasMazo, Nodo *&jugadorCartasRecogidas, Nodo *&computadoraCartasMazo, Nodo*&computadoraCartasRecogidas, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){
-    borrarContenidoArchivo(ok);
-    vaciarLosMazos(mazo, cartasMesa, jugadorCartasMazo, jugadorCartasRecogidas, computadoraCartasMazo, computadoraCartasRecogidas, ok);
-    vaciarLosJugadores(jugador, computadora, ok);
-    vaciarReparte(reparte, ok);
-    vaciarUltimo(ultimoEnRecogerPorEmparejamiento, ok);
-    vaciarUltimo(ultimoEnRealizarJugada, ok);
+      vaciarLosMazos(mazo, cartasMesa, jugadorCartasMazo, jugadorCartasRecogidas, computadoraCartasMazo, computadoraCartasRecogidas, archivo, ok);
+      vaciarLosJugadores(jugador, computadora, archivo, ok);
+      vaciarReparte(reparte, archivo, ok);
+      vaciarUltimo(ultimoEnRecogerPorEmparejamiento, archivo, ok);
+      vaciarUltimo(ultimoEnRealizarJugada, archivo, ok);
+    }
+    archivo.close();
 }
 
 ////////////////////////////////////////////////Cargar archivo////////////////////////////////////////////////////////////////////////
