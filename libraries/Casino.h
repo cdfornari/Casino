@@ -1207,19 +1207,27 @@ void eliminarListaUsandoOtra(Nodo *&mesa, Nodo *auxiliar, Nodo *&recogidas){
 }
 //Funcion que vacia todos los elementos que contenga la lista
 void vaciarLista(Nodo *&lista){
-    Nodo *auxiliar=NULL;
-    while (lista!=NULL)
-    {   auxiliar=lista;
-        lista=lista->siguiente;
-        delete auxiliar;
+    Nodo *auxiliar = lista;
+    lista = lista->siguiente;
+    while (auxiliar != NULL)
+    {
+        delete auxiliar;  
+        auxiliar=lista;
+        if(lista != NULL)
+            lista = lista->siguiente;
     }
+    lista = NULL;
 }
 //Funcion que vacia todos los elementos que contenga la lista
 void reiniciarValores(Nodo *mazo, Nodo *cartasMesa, Jugador &jugador, Jugador &computadora, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada){
     vaciarLista(mazo);
     vaciarLista(cartasMesa);
+    jugador.clarezas = 0;
+    jugador.idEmparejamiento = 0;
     vaciarLista(jugador.cartasMazo);
     vaciarLista(jugador.cartasRecogidas);
+    computadora.clarezas = 0;
+    computadora.idEmparejamiento = 0;
     vaciarLista(computadora.cartasMazo);
     vaciarLista(computadora.cartasRecogidas);
     ultimoEnRecogerPorEmparejamiento=Null;

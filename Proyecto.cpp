@@ -34,7 +34,6 @@ int main (){
         {
             case '1':
                 opcionNuevaPartida=true;
-                reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
                 srand(time(0));
                 barajear(mazo);
                 repartirAMesa(mazo,cartasMesa);
@@ -100,6 +99,7 @@ int main (){
                         break;
                     }
                 contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
+                reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
             break;
             case '2':
                     if(existeArchivo()){
