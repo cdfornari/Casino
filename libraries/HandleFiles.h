@@ -51,18 +51,6 @@ void vaciarMazo(Nodo *mazo, bool &ok){
         archivo.close();
     }   
 }
-//Vacia las variable global booleana
-void vaciarVariableGlobal(bool variableGlobal, bool &ok){
-    ofstream archivo;
-    archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
-    if(archivo.fail()){
-       ok=false;
-    } else {
-        archivo<<variableGlobal<<endl; 
-        archivo<<"///"<<endl;                 //Separa cada variable con un ///
-        archivo.close();
-    }  
-}
 //Si el archivo ya tenia contenido, lo borra
 void borrarContenidoArchivo(bool &ok){ 
     ofstream archivo;
@@ -71,6 +59,9 @@ void borrarContenidoArchivo(bool &ok){
         ok=false;
     archivo.close();
 }
+
+//////////////////////////////Funciones a usar para vaciar la informacion/////////////////////////////////////////////////////////////////
+
 //Vacian todas las cartas en el archivo
 void vaciarLosMazos(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, bool &ok){ //Vaciar todo de una vez
     borrarContenidoArchivo(ok);
@@ -87,9 +78,29 @@ void vaciarLosJugadores(Jugador *jugador, Jugador *computadora, bool &ok){
     vaciarJugadoresArchivo(computadora, ok);
 }
 
-void vaciarTodasVariablesGlobales(bool reparte, bool recogio, bool &ok){
-    vaciarVariableGlobal(recogio, ok);
-    vaciarVariableGlobal(reparte, ok);
+//Vacia las variable global booleana
+void vaciarReparte(int reparte, bool &ok){
+    ofstream archivo;
+    archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
+    if(archivo.fail()){
+       ok=false;
+    } else {
+        archivo<<reparte<<endl; 
+        archivo<<"///"<<endl;                 //Separa cada variable con un ///
+        archivo.close();
+    }  
+}
+
+void vaciarUltimo(Ultimo ultimoRecogerOJugar, bool &ok){
+    ofstream archivo;
+    archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
+    if(archivo.fail()){
+       ok=false;
+    } else {
+        archivo<<ultimoRecogerOJugar<<endl; 
+        archivo<<"///"<<endl;                 //Separa cada variable con un ///
+        archivo.close();
+    }  
 }
 
 ////////////////////////////////////////////////Cargar archivo////////////////////////////////////////////////////////////////////////
@@ -109,7 +120,23 @@ void insertarAlFinal(Nodo *&lista, Carta carta){
         auxiliar->siguiente=newCarta;
     }
 }
-//Funcion que permite convertir un texto a su correspondiente enum
+//Funcion que permite convertir un texto a su correspondiente enum Ultimo
+Ultimo convertirUltimo(Ultimo &ultimoRecogerOJugar, string linea){
+    char figura=linea[0];
+    switch (figura){
+    case '0':
+            return Persona;
+        break;
+    case '1':
+            return Computadora;
+        break;
+    default:
+            return Null;
+        break;
+    }
+}
+
+//Funcion que permite convertir un texto a su correspondiente enum Figuras
 Figuras convertirFiguras(string linea){
     char figura=linea[0];
     switch (figura){
@@ -198,12 +225,21 @@ void cargarJugador(Jugador *&jugador, ifstream &archivo){
             contador=0;
     }
 }
-//Cargar variable global
-void cargarVariableGlobal(bool &variableGlobal, ifstream &archivo){
+//Cargar variable reparte
+void cargarReparte(int &reparte, ifstream &archivo){
     string linea="l";
     while(!archivo.eof() && linea!="///"){
         getline(archivo, linea);
-        (linea=="0") ? variableGlobal=false : variableGlobal=true;
+        (linea=="0") ? reparte=0 : reparte=1;
+    }
+}
+
+//Cargar enum Ultimo
+void cargarUltimo(Ultimo &ultimoRecogerOJugar, ifstream &archivo){
+    string linea="l";
+    while(!archivo.eof() && linea!="///"){
+        getline(archivo, linea);
+        convertirUltimo(ultimoRecogerOJugar, linea);
     }
 }
 
@@ -212,8 +248,9 @@ void cargarVariosJugadores(Jugador *&jugador, Jugador *&computadora, ifstream &a
         cargarJugador(jugador, archivo);
         cargarJugador(computadora, archivo);
 }
+
 //Funcion que carga al programa principal todos los mazos necesarios y jugadores para reconstruir la partida anterior
-void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, Jugador *&jugador, Jugador *&computadora, bool &recogio, bool &reparte){ //Cargar todo de una vez
+void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, Jugador *&jugador, Jugador *&computadora, int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada){ //Cargar todo de una vez
     ifstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::in);
     if(archivo.fail()){
@@ -226,8 +263,9 @@ void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, N
         cargarMazo(mazo5, archivo);
         cargarMazo(mazo6, archivo);
         cargarVariosJugadores(jugador,computadora,archivo);
-        cargarVariableGlobal(recogio, archivo);
-        cargarVariableGlobal(reparte, archivo);
+        cargarReparte(reparte, archivo);
+        cargarUltimo(ultimoEnRecogerPorEmparejamiento, archivo);
+        cargarUltimo(ultimoEnRealizarJugada, archivo);
     }
     archivo.close();
 }
