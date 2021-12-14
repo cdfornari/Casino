@@ -1196,39 +1196,6 @@ void eliminarListaUsandoOtra(Nodo *&mesa, Nodo *auxiliar, Nodo *&recogidas){
         auxiliar=auxiliar->siguiente;
     }
 }
-//Al encontrar una cadena de emparejamientos, se salta a la ultima carta de ese emparejamiento
-Nodo *saltarEmparejamiento(Nodo *lista){
-    int id;
-    id=lista->carta.idEmparejamiento;
-    Nodo *anterior=NULL;
-    while (lista != NULL && lista->carta.idEmparejamiento==id){
-        anterior=lista;
-        lista=lista->siguiente;
-    }
-    return anterior; 
-}
-//Retorna carta que cumpla que haya una carta de valor igual a la suma en el mazo del jugador
-Carta sumaEstaEnMazo(Nodo *lista, int suma, bool &existe){ 
-    Carta carta;
-    while (lista!=NULL){
-        if(lista->carta.valor==suma){
-            existe=true;
-            carta=lista->carta;
-        }
-        lista=lista->siguiente;
-    }
-    return carta;
-}
-//Funcion que agrega los emparejamientos a la lista de recogidas
-void recogerEmparejamiento(Nodo *mesa, Nodo *&recogidas, Carta cartaRecogida){
-        Carta carta;
-        while(mesa!=NULL){
-            carta=mesa->carta;
-            if(carta.idEmparejamiento==cartaRecogida.idEmparejamiento)
-                insertarCartaEnMazo(recogidas, carta);
-            mesa=mesa->siguiente;   
-        }
-}
 //Funcion que vacia todos los elementos que contenga la lista
 void vaciarLista(Nodo *&lista){
     Nodo *auxiliar=nullptr;
@@ -1236,52 +1203,6 @@ void vaciarLista(Nodo *&lista){
     {   auxiliar=lista;
         lista=lista->siguiente;
         delete auxiliar;
-    }
-}
-//Funcion que calcula todas las sumas posibles dado un mazo y que la suma este en el mazo del jugador.
-void sumasPosibles(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, int combinacion, bool &eliminar){
-    int suma=0;
-    bool ok=false;
-    Carta carta, cartaDelMazo;
-    Nodo *listaAuxiliar=nullptr;
-    int  posiblesCasos = pow(2,sumaMazo(mesa));
-    for (int i = 0; i < posiblesCasos; i++){
-        suma=0;
-        ok=false;
-        for (int j = 0; j < sumaMazo(mesa); j++){
-            if ((i & (1 << j)) > 0){
-        
-                carta = buscarCartaPorPosicion(mesa,j+1);
-                if(carta.representacion!='-'){
-                    suma=0;
-                    break;
-                }
-                if(carta.idEmparejamiento!=0){
-                    recogerEmparejamiento(mesa, listaAuxiliar, carta);
-                    suma+=carta.sumaEmparejadas;
-                }else{
-                    insertarCartaEnMazo(listaAuxiliar, carta);
-                    suma+=carta.valor;
-                }
-            }   
-        }
-        cartaDelMazo=sumaEstaEnMazo(mazoJugador, suma, ok);
-        if(ok==true){
-            if(combinacion==-1){
-                cout<<"\nCombinacion: "<<i<<endl;
-                cout<<"\nCarta del mazo: ";
-                imprimirCarta(cartaDelMazo);
-                cout<<"\n";
-                cout<<"Cartas de la mesa: "<<endl;
-                imprimirMazo(listaAuxiliar);
-            } else if(i==combinacion){
-                eliminarCartaDeMazo(mazoJugador, cartaDelMazo); //Se elimina carta del mazo jugador
-                eliminarListaUsandoOtra(mesa, listaAuxiliar, recogidas); //Se inserta en las recogidas y elimina de la mesa
-                insertarCartaEnMazo(recogidas,cartaDelMazo); //Se inserta la carta en mesa recogidas
-                eliminar=true;
-            }
-        }
-        vaciarLista(listaAuxiliar);    
     }
 }
 //Recoger en la mesa las espadas, dandole prioridad al sumar el puntaje
@@ -1351,7 +1272,7 @@ void recogerPorCartaEspecifica(Figuras figuraARecoger, int valorARecoger, Nodo *
 void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado){
     int suma=0, cantidadCartas=0;
     bool ok=false;
-    Carta carta, cartaDelMazo;
+    Carta carta, cartaDelMazo, cartaABuscar;
     Nodo *listaAuxiliar=nullptr;
     int  posiblesCasos = pow(2,sumaMazo(mesa));
     for (int i = 0; i < posiblesCasos; i++){
@@ -1359,27 +1280,18 @@ void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogid
         ok=false;
         for (int j = 0; j < sumaMazo(mesa); j++){
             if ((i & (1 << j)) > 0){
-        
                 carta=buscarCartaPorPosicion(mesa,j+1);
                 ++cantidadCartas;
                 imprimirCarta(carta);
-
-                if(carta.representacion!='-'){
+                if(carta.representacion!='-' || carta.idEmparejamiento!=0){
                     suma=0;
                     break;
                 }
-                if(carta.idEmparejamiento!=0){
-                    recogerEmparejamiento(mesa, listaAuxiliar, carta);
-                    suma+=carta.sumaEmparejadas;
-                }else{
-                    insertarCartaEnMazo(listaAuxiliar, carta);
-                    suma+=carta.valor;
-                }
             }   
         }
-        cartaDelMazo=sumaEstaEnMazo(mazoComputadora, suma, ok);
-        
-        if(ok==true && cantidadCartas>=2){
+        cartaABuscar.valor=suma;
+        cartaDelMazo=buscarCarta(mazoComputadora, cartaABuscar);
+        if(cartaDelMazo!=-1 && cantidadCartas>=2){
             eliminarCartaDeMazo(mazoComputadora, cartaDelMazo); //Se elimina carta del mazo jugador
             eliminarListaUsandoOtra(mesa, listaAuxiliar, recogidas); //Se inserta en las recogidas y elimina de la mesa
             insertarCartaEnMazo(recogidas,cartaDelMazo); //Se inserta la carta en mesa recogidas
