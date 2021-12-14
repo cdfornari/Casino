@@ -102,9 +102,9 @@ void vaciarUltimo(Ultimo ultimoRecogerOJugar, bool &ok){
     }  
 }
 
-void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){
+void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Nodo *&jugadorCartasMazo, Nodo *&jugadorCartasRecogidas, Nodo *&computadoraCartasMazo, Nodo*&computadoraCartasRecogidas, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){
     borrarContenidoArchivo(ok);
-    vaciarLosMazos(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, ok);
+    vaciarLosMazos(mazo, cartasMesa, jugadorCartasMazo, jugadorCartasRecogidas, computadoraCartasMazo, computadoraCartasRecogidas, ok);
     vaciarLosJugadores(jugador, computadora, ok);
     vaciarReparte(reparte, ok);
     vaciarUltimo(ultimoEnRecogerPorEmparejamiento, ok);
