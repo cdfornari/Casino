@@ -232,6 +232,17 @@ void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, N
     archivo.close();
 }
 
+//Verifica si el archivo de texto para cargar la partida fue creado
+bool existeArchivo(){
+    bool existe=false;
+    ifstream archivo;
+    archivo.open(nombreArchivo.c_str(), ios::in);
+    if(archivo.fail())
+	    existe=false;
+    else
+        existe=true;
+    return existe;
+}
 
 /////////////////////////////////////////////////////////TESTING////////////////////////////////////////////////////////////////////
 
