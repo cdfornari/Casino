@@ -1291,7 +1291,7 @@ void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogid
         }
         cartaABuscar.valor=suma;
         cartaDelMazo=buscarCarta(mazoComputadora, cartaABuscar);
-        if(cartaDelMazo!=-1 && cantidadCartas>=2){
+        if(cartaDelMazo.valor!=-1 && cantidadCartas>=2){
             eliminarCartaDeMazo(mazoComputadora, cartaDelMazo); //Se elimina carta del mazo jugador
             eliminarListaUsandoOtra(mesa, listaAuxiliar, recogidas); //Se inserta en las recogidas y elimina de la mesa
             insertarCartaEnMazo(recogidas,cartaDelMazo); //Se inserta la carta en mesa recogidas

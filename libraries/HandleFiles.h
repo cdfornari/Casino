@@ -10,9 +10,9 @@ const string nombreArchivo = "PartidaAnterior.txt"; //Para que no cambie el nomb
 ////////////////////////////////////////////////Vaciar en Archivo////////////////////////////////////////////////////////////////////////
 
 //Escribe en el archivo la informacion de un jugador 
-void vaciarJugador(Jugador *jugador, ofstream &archivo){
-    archivo<<jugador->clarezas<<endl;
-    archivo<<jugador->idEmparejamiento<<endl;
+void vaciarJugador(Jugador jugador, ofstream &archivo){
+    archivo<<jugador.clarezas<<endl;
+    archivo<<jugador.idEmparejamiento<<endl;
 }
 //Escribe en el archivo todo el contenido de una sola carta
 void vaciarCarta(Carta carta, ofstream &archivo){ 
@@ -25,7 +25,7 @@ void vaciarCarta(Carta carta, ofstream &archivo){
     archivo<<carta.doblada<<endl;
 }
 //Vacia en el archivo un jugador
-void vaciarJugadoresArchivo(Jugador *jugador, bool &ok){
+void vaciarJugadoresArchivo(Jugador jugador, bool &ok){
     ofstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::app);
     if(archivo.fail()){
@@ -64,7 +64,6 @@ void borrarContenidoArchivo(bool &ok){
 
 //Vacian todas las cartas en el archivo
 void vaciarLosMazos(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, bool &ok){ //Vaciar todo de una vez
-    borrarContenidoArchivo(ok);
     vaciarMazo(mazo1, ok);
     vaciarMazo(mazo2, ok);
     vaciarMazo(mazo3, ok);
@@ -73,13 +72,13 @@ void vaciarLosMazos(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo
     vaciarMazo(mazo6, ok);
 }
 //Vacia toda la informacion de los jugadores en el archivo
-void vaciarLosJugadores(Jugador *jugador, Jugador *computadora, bool &ok){
+void vaciarLosJugadores(Jugador jugador, Jugador computadora, bool &ok){
     vaciarJugadoresArchivo(jugador, ok);
     vaciarJugadoresArchivo(computadora, ok);
 }
 
 //Vacia las variable global booleana
-void vaciarReparte(int reparte, bool &ok){
+void vaciarReparte(short int reparte, bool &ok){
     ofstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
     if(archivo.fail()){
@@ -101,6 +100,15 @@ void vaciarUltimo(Ultimo ultimoRecogerOJugar, bool &ok){
         archivo<<"///"<<endl;                 //Separa cada variable con un ///
         archivo.close();
     }  
+}
+
+void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){
+    borrarContenidoArchivo(ok);
+    vaciarLosMazos(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, ok);
+    vaciarLosJugadores(jugador, computadora, ok);
+    vaciarReparte(reparte, ok);
+    vaciarUltimo(ultimoEnRecogerPorEmparejamiento, ok);
+    vaciarUltimo(ultimoEnRealizarJugada, ok);
 }
 
 ////////////////////////////////////////////////Cargar archivo////////////////////////////////////////////////////////////////////////
@@ -198,24 +206,23 @@ void cargarMazo(Nodo *&mazo, ifstream &archivo){
     }
 }
 //Funcion que crea al jugador leyendo cada linea del archivo
-void creandoJugador(Jugador *&jugador, string linea, int contador){
+void creandoJugador(Jugador &jugador, string linea, int contador){
     if(linea=="//") contador=10;
     switch (contador)
     {
     case 1:
-        jugador->clarezas=stoi(linea);
+        jugador.clarezas=stoi(linea);
         break;
     case 2:
-        jugador->idEmparejamiento=stoi(linea);
+        jugador.idEmparejamiento=stoi(linea);
     default:
         break;
     }
 }
 //Funcion que carga en el programa todo el contenido de un jugador
-void cargarJugador(Jugador *&jugador, ifstream &archivo){
+void cargarJugador(Jugador &jugador, ifstream &archivo){
     int contador=0;
     string linea="l";
-    jugador=new Jugador();
     while(!archivo.eof() && linea!="//"){
         ++contador;
         getline(archivo, linea);
@@ -226,7 +233,7 @@ void cargarJugador(Jugador *&jugador, ifstream &archivo){
     }
 }
 //Cargar variable reparte
-void cargarReparte(int &reparte, ifstream &archivo){
+void cargarReparte(short int &reparte, ifstream &archivo){
     string linea="l";
     while(!archivo.eof() && linea!="///"){
         getline(archivo, linea);
@@ -244,24 +251,24 @@ void cargarUltimo(Ultimo &ultimoRecogerOJugar, ifstream &archivo){
 }
 
 //Funcion que carga los jugadores del juego
-void cargarVariosJugadores(Jugador *&jugador, Jugador *&computadora, ifstream &archivo){
+void cargarVariosJugadores(Jugador &jugador, Jugador &computadora, ifstream &archivo){
         cargarJugador(jugador, archivo);
         cargarJugador(computadora, archivo);
 }
 
 //Funcion que carga al programa principal todos los mazos necesarios y jugadores para reconstruir la partida anterior
-void cargarInformacion(Nodo *&mazo1, Nodo *&mazo2, Nodo *&mazo3, Nodo *&mazo4, Nodo *&mazo5, Nodo *&mazo6, Jugador *&jugador, Jugador *&computadora, int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada){ //Cargar todo de una vez
+void cargarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada){ //Cargar todo de una vez
     ifstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::in);
     if(archivo.fail()){
         cout<<"No existe archivo";
     } else{
-        cargarMazo(mazo1, archivo);
-        cargarMazo(mazo2, archivo);
-        cargarMazo(mazo3, archivo);
-        cargarMazo(mazo4, archivo);
-        cargarMazo(mazo5, archivo);
-        cargarMazo(mazo6, archivo);
+        cargarMazo(mazo, archivo);
+        cargarMazo(cartasMesa, archivo);
+        cargarMazo(jugador.cartasMazo, archivo);
+        cargarMazo(jugador.cartasRecogidas, archivo);
+        cargarMazo(computadora.cartasMazo, archivo);
+        cargarMazo(computadora.cartasRecogidas, archivo);
         cargarVariosJugadores(jugador,computadora,archivo);
         cargarReparte(reparte, archivo);
         cargarUltimo(ultimoEnRecogerPorEmparejamiento, archivo);

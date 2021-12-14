@@ -16,12 +16,15 @@ int main (){
     computadora.clarezas = 0;
     computadora.idEmparejamiento = 0;
     bool isMac = seleccionarSistemaOperativo();
+    bool opcionNuevaPartida=false;
+    bool ok=false;
     char opcionSeleccionada;
     short int reparte;
     short int contadorCartasJugador;
     short int contadorCartasComputadora;
     short int *contadorCartasMesa = new short int;
     Ultimo ultimoEnRecogerPorEmparejamiento = Null;
+    Ultimo ultimoEnRealizarJugada = Null;
     do
     {
         limpiarConsola(isMac);
@@ -30,6 +33,7 @@ int main (){
         switch (opcionSeleccionada)
         {
             case '1':
+                opcionNuevaPartida=true;
                 srand(time(0));
                 barajear(mazo);
                 repartirAMesa(mazo,cartasMesa);
@@ -56,6 +60,7 @@ int main (){
                         }
                         contadorCartasJugador--;
                         contadorCartasComputadora--;
+                        vaciarInformacion(mazo, cartasMesa, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                 } while (mazo != NULL);
                 if(cartasMesa != NULL)
@@ -96,7 +101,15 @@ int main (){
                 contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
             break;
             case '2':
-                cout << "COMING SOON\n";
+                if(opcionNuevaPartida==false){ //Si el jugador NO selecciono la opcion de nueva partida
+                    if(existeArchivo()){
+                        cargarInformacion(mazo, cartasMesa, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
+                        cout<<"Partida cargada\n";
+                    }
+                } else
+                    ok=false;
+                if(ok)
+                   // jugarPartida(); //Continua con la partida
             break;
             case '3':
             break;
