@@ -6,6 +6,7 @@
 using namespace std;
 
 /******************* TIPOS ***********************/
+enum Ultimo {Persona,Computadora,Null};
 
 enum Figuras {espada,trebol,corazon,diamante};
 typedef struct {
@@ -107,6 +108,17 @@ int contarCartas(Nodo *mazo){
     while (mazo != NULL)
     {
         contador++;
+        mazo = mazo->siguiente;
+    }
+    return contador;
+}
+
+int contarCartasPorValor(Nodo *mazo, int valor){
+    int contador = 0;
+    while (mazo != NULL)
+    {
+        if(mazo->carta.valor == valor)
+            contador++;
         mazo = mazo->siguiente;
     }
     return contador;
@@ -388,22 +400,37 @@ void recogerCartaDeMesa(Nodo *&mesa, Nodo *&recogidas,Nodo *&mazoJugador, Carta 
     }  
 }
 
-bool cartaPuedeRecogerse(Carta cartaConLaQueSeRecoge, Carta cartaQueSeRecoge){
+bool cartaPuedeRecogerse(Carta cartaConLaQueSeRecoge, Carta cartaQueSeRecoge, Nodo *mesa, Jugador jugador, bool mostrarMensajeDeError){
     if(cartaQueSeRecoge.idEmparejamiento != 0){
         if (cartaConLaQueSeRecoge.valor == cartaQueSeRecoge.sumaEmparejadas)
             return true;
         else{
-            cout << "No se puede recoger. El valor de la carta no es igual a la suma del emparejamiento" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No se puede recoger. El valor de la carta no es igual a la suma del emparejamiento" << endl;
             return false;
         }
     }else{
         if (cartaConLaQueSeRecoge.valor == cartaQueSeRecoge.valor)
             return true;
         else{
-            cout << "No se puede recoger. El valor de las cartas no es igual" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No se puede recoger. El valor de las cartas no es igual" << endl;
             return false;
         }
     }
+    if (jugador.idEmparejamiento != 0 && cartaQueSeRecoge.idEmparejamiento != jugador.idEmparejamiento)
+    {
+        Carta cartaABuscar;
+        cartaABuscar.valor = buscarCartaEnMazoPorIdEmparejamiento(mesa,jugador.idEmparejamiento).sumaEmparejadas;
+        if(cartaConLaQueSeRecoge.valor == cartaABuscar.valor){
+            if(contarCartasPorValor(jugador.cartasMazo,cartaABuscar.valor) < 2){
+                if(mostrarMensajeDeError)
+                    cout << "No puedes recoger porque no tienes otra carta con la que recoger tu emparejamiento activo" << endl;
+                return false;
+            }
+        }
+    }  
+    return true;
 }
 
 void recogerVariasCartasDeMesa(Nodo *&mesa, Nodo *&recogidas,Nodo *&mazoJugador, Carta cartaRecogiendo, Nodo *&cartasQueSeRecogen){
@@ -416,7 +443,7 @@ void recogerVariasCartasDeMesa(Nodo *&mesa, Nodo *&recogidas,Nodo *&mazoJugador,
     }
 }
 
-bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQueSeRecogen){
+bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQueSeRecogen, Nodo *mesa, Jugador jugador, bool mostrarMensajeDeError){
     Nodo *auxiliar = cartasQueSeRecogen;
     bool figuraEnSeleccion = false;
     while(auxiliar != NULL){
@@ -429,7 +456,8 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
     if(figuraEnSeleccion)
     {
         if(cartaConLaQueSeRecoge.valor <= 10){
-            cout << "No puedes recoger figuras con cartas numericas" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes recoger figuras con cartas numericas" << endl;
             return false;
         }
         //Verificar que solo se hayan seleccionado figuras
@@ -437,7 +465,8 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
         while (auxiliar != NULL)
         {
             if(auxiliar->carta.valor <= 10){
-                cout << "No puedes recoger cartas numericas con figuras" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "No puedes recoger cartas numericas con figuras" << endl;
                 return false;
             }
         }
@@ -446,12 +475,14 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
         while (auxiliar != NULL)
         {
             if(auxiliar->carta.valor != cartaConLaQueSeRecoge.valor){
-                cout << "Solo se pueden recoger figuras iguales" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "Solo se pueden recoger figuras iguales" << endl;
                 return false;
             }
         }
         if(contarCartas(cartasQueSeRecogen) == 2){ //2 + la del mazo del jugador
-            cout << "No se puede recoger 3 cartas de una figura" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No se puede recoger 3 cartas de una figura" << endl;
             return false;
         }
         return true;
@@ -459,7 +490,8 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
     else
     {
         if(cartaConLaQueSeRecoge.valor > 10){
-            cout << "No puedes recoger cartas numericas con figuras" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes recoger cartas numericas con figuras" << endl;
             return false;
         }
         //Verificar si se seleccionaron emparejamientos
@@ -487,16 +519,31 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
                 auxiliar = auxiliar->siguiente;
             }
             if(sumaQueSeRecoge > 10){
-                cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
                 return false;
             }
             if (sumaQueSeRecoge != cartaConLaQueSeRecoge.valor){
-                cout << "La suma de las cartas seleccionadas no coincide con el valor de la carta usada para recoger" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "La suma de las cartas seleccionadas no coincide con el valor de la carta usada para recoger" << endl;
                 return false;
             }
+            if (jugador.idEmparejamiento != 0)
+            {
+                Carta cartaABuscar;
+                cartaABuscar.valor = buscarCartaEnMazoPorIdEmparejamiento(mesa,jugador.idEmparejamiento).sumaEmparejadas;
+                if(cartaConLaQueSeRecoge.valor == cartaABuscar.valor){
+                    if(contarCartasPorValor(jugador.cartasMazo,cartaABuscar.valor) < 2){
+                        if(mostrarMensajeDeError)
+                            cout << "No puedes recoger porque no tienes otra carta con la que recoger tu emparejamiento activo" << endl;
+                        return false;
+                    }
+                }
+            } 
             return true;
         }else if(id1 != 0 && id2 != 0 && id1 != id2){
-            cout << "No puedes recoger. Hay cartas de emparejamientos distintos" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes recoger. Hay cartas de emparejamientos distintos" << endl;
             return false;
         }else{
             //determinar la suma que se espera del emparejamiento que pertenece a la seleccion
@@ -522,7 +569,8 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
                 auxiliar = auxiliar->siguiente;
             }
             if (sumaEmparejadas != sumaEsperada){
-                cout << "No estan seleccionadas todas las cartas de un emparejamiento" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "No estan seleccionadas todas las cartas de un emparejamiento" << endl;
                 return false;
             }
             //determinar suma total de la seleccion
@@ -546,13 +594,27 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
                 auxiliar = auxiliar->siguiente;
             }
             if(sumaTotal > 10){
-                cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
                 return false;
             }
             if (sumaTotal != cartaConLaQueSeRecoge.valor){
-                cout << "La suma de las cartas seleccionadas no coincide con el valor de la carta usada para recoger" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "La suma de las cartas seleccionadas no coincide con el valor de la carta usada para recoger" << endl;
                 return false;
             }
+            if (jugador.idEmparejamiento != 0 && id1 != jugador.idEmparejamiento)
+            {
+                Carta cartaABuscar;
+                cartaABuscar.valor = buscarCartaEnMazoPorIdEmparejamiento(mesa,jugador.idEmparejamiento).sumaEmparejadas;
+                if(cartaConLaQueSeRecoge.valor == cartaABuscar.valor){
+                    if(contarCartasPorValor(jugador.cartasMazo,cartaABuscar.valor) < 2){
+                        if(mostrarMensajeDeError)
+                            cout << "No puedes recoger porque no tienes otra carta con la que recoger tu emparejamiento activo" << endl;
+                        return false;
+                    }
+                }
+            } 
             return true;
         }
     }
@@ -585,21 +647,35 @@ void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Cart
     }
 }
 
-bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja, Nodo *mesa){
+bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja, Nodo *mesa, bool mostrarMensajeDeError){
     if (cartaAEmparejar.valor > 10 || cartaConLaQueSeEmpareja.valor > 10){
-        cout << "No puedes emparejar 2 cartas J, Q o K" << endl;
+        if(mostrarMensajeDeError)
+            cout << "No puedes emparejar 2 cartas J, Q o K" << endl;
         return false;
     }
     if(jugador.idEmparejamiento != 0){
-        cout << "No puedes emparejar, ya tienes un emparejamiento activo" << endl;
+        if(mostrarMensajeDeError)
+            cout << "No puedes emparejar, ya tienes un emparejamiento activo" << endl;
         return false;
     }
     if(cartaConLaQueSeEmpareja.doblada){
-        cout << "No puedes sumar al emparejamiento. Esta protegido" << endl;
+        if(mostrarMensajeDeError)
+            cout << "No puedes sumar al emparejamiento. Esta protegido" << endl;
         return false;
     }
     if(cartaAEmparejar.valor + cartaConLaQueSeEmpareja.sumaEmparejadas > 10 || cartaAEmparejar.valor + cartaConLaQueSeEmpareja.valor > 10){
-        cout << "No puedes emparejar, la suma del emparejamiento pasaria de 10" << endl;
+        if(mostrarMensajeDeError)
+            cout << "No puedes emparejar, la suma del emparejamiento pasaria de 10" << endl;
+        return false;
+    }
+    Carta cartaABuscar;
+    if(cartaConLaQueSeEmpareja.idEmparejamiento == 0)
+        cartaABuscar.valor = cartaAEmparejar.valor + cartaConLaQueSeEmpareja.valor;
+    else
+        cartaABuscar.valor = cartaAEmparejar.valor + cartaConLaQueSeEmpareja.sumaEmparejadas;
+    if(buscarCarta(jugador.cartasMazo,cartaABuscar).valor == -1){
+        if(mostrarMensajeDeError)
+            cout << "No puedes emparejar porque no tienes una carta con la que recoger el emparejamiento" << endl;
         return false;
     }
     return true;
@@ -644,9 +720,10 @@ void emparejarMultiplesCartas(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmpar
     }
 }
 
-bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEmparejan, Jugador jugador){
+bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEmparejan, Jugador jugador, bool mostrarMensajeDeError){
     if(jugador.idEmparejamiento != 0){
-        cout << "No puedes emparejar, ya tienes un emparejamiento activo" << endl;
+        if(mostrarMensajeDeError)
+            cout << "No puedes emparejar, ya tienes un emparejamiento activo" << endl;
         return false;
     }
     Nodo *auxiliar = cartasQueSeEmparejan;
@@ -661,7 +738,8 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
     if(figuraEnSeleccion)
     {
         if(cartaAEmparejar.valor <= 10){
-            cout << "No puedes emparejar cartas numericas con figuras" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes emparejar cartas numericas con figuras" << endl;
             return false;
         }
         //Verificar que solo se hayan seleccionado figuras
@@ -669,7 +747,8 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
         while (auxiliar != NULL)
         {
             if(auxiliar->carta.valor <= 10){
-                cout << "No puedes emparejar figuras con cartas numericas" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "No puedes emparejar figuras con cartas numericas" << endl;
                 return false;
             }
         }
@@ -678,13 +757,19 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
         while (auxiliar != NULL)
         {
             if(auxiliar->carta.valor != cartaAEmparejar.valor){
-                cout << "Solo se pueden recoger figuras iguales" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "Solo se pueden recoger figuras iguales" << endl;
                 return false;
             }
         }
         if(contarCartas(cartasQueSeEmparejan) == 3){ //3 + la del mazo del jugador
-            cout << "No se puede emparejar 4 cartas de una figura." << endl;
-            cout << "Consejo: prueba recogiendolas" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No se puede emparejar 4 cartas de una figura." << endl << "Consejo: prueba recogiendolas" << endl;
+            return false;
+        }
+        if(contarCartasPorValor(jugador.cartasMazo,cartaAEmparejar.valor) < 2){
+            if(mostrarMensajeDeError)
+                cout << "No puedes emparejar porque no tienes otra carta de la misma figura para recoger el emparejamiento" << endl;
             return false;
         }
         return true;
@@ -692,7 +777,8 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
     else
     {
         if(cartaAEmparejar.valor > 10){
-            cout << "No puedes emparejar cartas numericas con figuras" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes emparejar cartas numericas con figuras" << endl;
             return false;
         }
         //Verificar si se seleccionaron emparejamientos
@@ -704,7 +790,8 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
             if (auxiliar->carta.idEmparejamiento != 0)
             {
                 if(auxiliar->carta.doblada){
-                    cout << "Seleccionaste un emparejamiento protegido, no puedes sumar" << endl;
+                    if(mostrarMensajeDeError)
+                        cout << "Seleccionaste un emparejamiento protegido, no puedes sumar" << endl;
                     return false;
                 }
                 if (id1 == 0){
@@ -724,12 +811,14 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                 auxiliar = auxiliar->siguiente;
             }
             if(sumaQueSeEmpareja > 10){
-                cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
                 return false;
             }
             return true;
         }else if(id1 != 0 && id2 != 0 && id1 != id2){
-            cout << "No puedes emparejar. Hay cartas de emparejamientos distintos" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes emparejar. Hay cartas de emparejamientos distintos" << endl;
             return false;
         }else{
             //determinar la suma que se espera del emparejamiento que pertenece a la seleccion
@@ -753,7 +842,8 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                 auxiliar = auxiliar->siguiente;
             }
             if (sumaEmparejadas != sumaEsperada){
-                cout << "No estan seleccionadas todas las cartas de un emparejamiento" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "No estan seleccionadas todas las cartas de un emparejamiento" << endl;
                 return false;
             }
             //determinar suma total de la seleccion
@@ -768,7 +858,15 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                 auxiliar = auxiliar->siguiente;
             }
             if(sumaTotal > 10){
-                cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                if(mostrarMensajeDeError)
+                    cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                return false;
+            }
+            Carta cartaABuscar;
+            cartaABuscar.valor = sumaTotal;
+            if(buscarCarta(jugador.cartasMazo,cartaABuscar).valor == -1){
+                if(mostrarMensajeDeError)
+                    cout << "No puedes emparejar porque no tienes una carta con la que recoger el emparejamiento" << endl;
                 return false;
             }
             return true;
@@ -811,19 +909,28 @@ void doblarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaADoblar, Carta cart
     }
 }
 
-bool cartaPuedeDoblarse(Jugador jugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla, Nodo *mesa){
+bool cartaPuedeDoblarse(Jugador jugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla, Nodo *mesa, bool mostrarMensajeDeError){
+    Carta cartaABuscar;
     if(cartaConLaQueSeDobla.idEmparejamiento == 0){
         if(cartaADoblar.valor != cartaConLaQueSeDobla.valor){
-            cout << "Para doblar con otra carta que no esta emparejada estas deben tener el mismo valor" << endl;
+            if(mostrarMensajeDeError)
+                cout << "Para doblar con otra carta que no esta emparejada estas deben tener el mismo valor" << endl;
             return false;
         }else
-            return true;
+            cartaABuscar.valor = cartaConLaQueSeDobla.valor;
     }else
         if(cartaADoblar.valor != cartaConLaQueSeDobla.sumaEmparejadas){
-            cout << "No puedes doblar. La carta no vale igual que la suma del emparejamiento" << endl;
+            if(mostrarMensajeDeError)
+                cout << "No puedes doblar. La carta no vale igual que la suma del emparejamiento" << endl;
             return false;
         }else
-            return true;
+            cartaABuscar.valor = cartaConLaQueSeDobla.sumaEmparejadas;
+    if(contarCartasPorValor(jugador.cartasMazo,cartaABuscar.valor) < 2){
+        if(mostrarMensajeDeError)
+            cout << "No puedes emparejar porque no tienes otra carta con la que recoger el emparejamiento doblado" << endl;
+        return false;
+    }
+    return true;
 }
 
 /******************* SELECCIONAR MOVIMIENTO JUGADOR ***********************/
@@ -849,7 +956,7 @@ short int seleccionarCartaPorPosicion(Nodo *cartas, short int contadorCartas){
     return posicionSeleccionada;
 }
 
-void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, Nodo *&cartasJugador, Nodo *&recogidasJugador, short int contadorCartasJugador, short int *contadorCartasMesa, bool isMac){
+void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, Nodo *&cartasJugador, Nodo *&recogidasJugador, short int contadorCartasJugador, short int *contadorCartasMesa, bool isMac, Ultimo *ultimoEnRecogerPorEmparejamiento){
     char *opcionSeleccionada = new char;
     bool *movimientoValido= new bool(false);
     short int *posicionCartaDeMesa = new short int;
@@ -877,12 +984,16 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
         switch (*opcionSeleccionada)
         {
             case '1':
-                cout << "Que carta desea lanzar?" << endl;
-                posicionCartaSeleccionada = seleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador);
-                cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicionCartaSeleccionada);
-                lanzarCartaEnMesa(mesa, cartasJugador, cartaSeleccionada);
-                (*contadorCartasMesa)++;
-                *movimientoValido = true;
+                if(jugador->idEmparejamiento != 0)
+                    cout << "Debes recoger tu emparejamiento antes de lanzar una carta" << endl;
+                else{
+                    cout << "Que carta desea lanzar?" << endl;
+                    posicionCartaSeleccionada = seleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador);
+                    cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicionCartaSeleccionada);
+                    lanzarCartaEnMesa(mesa, cartasJugador, cartaSeleccionada);
+                    (*contadorCartasMesa)++;
+                    *movimientoValido = true;
+                }
             break;
             case '2':
                 cout << "Que carta desea usar para emparejar?" << endl;
@@ -904,7 +1015,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                     cout << "Con que carta desea emparejar?" << endl;
                     *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
                     *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
-                    if (cartaPuedeEmparejarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa))
+                    if (cartaPuedeEmparejarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa,true))
                     {
                         if((*cartaMesaSeleccionada).idEmparejamiento != 0 && (*cartaMesaSeleccionada).idEmparejamiento == (*computadora).idEmparejamiento)
                             computadora->idEmparejamiento = 0;
@@ -930,7 +1041,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         } while (cartaExisteEnMazo(cartasParaEmparejar,*cartaMesaSeleccionada));
                         insertarCartaEnMazo(cartasParaEmparejar,*cartaMesaSeleccionada);
                     }
-                    if (multiplesCartasPuedenEmparejarse(cartaSeleccionada,cartasParaEmparejar,*jugador))
+                    if (multiplesCartasPuedenEmparejarse(cartaSeleccionada,cartasParaEmparejar,*jugador,true))
                     {
                         Nodo *auxiliar = cartasParaEmparejar;
                         int id;
@@ -968,13 +1079,15 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                     cout << "Que carta desea recoger?" << endl;
                     *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
                     *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
-                    if (cartaPuedeRecogerse(cartaSeleccionada,*cartaMesaSeleccionada))
+                    if (cartaPuedeRecogerse(cartaSeleccionada,*cartaMesaSeleccionada,mesa,*jugador,true))
                     {
-                        if((*cartaMesaSeleccionada).idEmparejamiento != 0)
+                        if((*cartaMesaSeleccionada).idEmparejamiento != 0){
+                            *ultimoEnRecogerPorEmparejamiento = Persona;
                             if((*cartaMesaSeleccionada).idEmparejamiento == (*jugador).idEmparejamiento)
                                 (*jugador).idEmparejamiento = 0;
                             else
                                 (*computadora).idEmparejamiento = 0;
+                        }
                         recogerCartaDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
                         *contadorCartasMesa = contarCartas(mesa);
                         if(*contadorCartasMesa == 0)
@@ -998,7 +1111,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         } while (cartaExisteEnMazo(cartasParaRecoger,*cartaMesaSeleccionada));
                         insertarCartaEnMazo(cartasParaRecoger,*cartaMesaSeleccionada);
                     }
-                    if (multiplesCartasPuedenRecogerse(cartaSeleccionada,cartasParaRecoger))
+                    if (multiplesCartasPuedenRecogerse(cartaSeleccionada,cartasParaRecoger,mesa,*jugador,true))
                     {
                         Nodo *auxiliar = cartasParaRecoger;
                         while(auxiliar != NULL){
@@ -1025,7 +1138,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 cout << "Que carta desea doblar?" << endl;
                 *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
                 *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
-                if (cartaPuedeDoblarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa))
+                if (cartaPuedeDoblarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa,true))
                 {
                     doblarCarta(mesa,jugador->cartasMazo,cartaSeleccionada,*cartaMesaSeleccionada);
                     *contadorCartasMesa = contarCartas(mesa);
@@ -1182,7 +1295,7 @@ void recogerPorFigura(Figuras figuraARecoger, Nodo *&mesa, Nodo *&recogidas, Nod
         }
         auxiliar=auxiliar->siguiente;
         if(cartaDelMazo.valor!=-1){
-            if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa)){
+            if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
                 if(contarCartas(mesa)==0)
                     computadora.clarezas++;
@@ -1203,7 +1316,7 @@ void recogerPorValor(int valorARecoger, Nodo *&mesa, Nodo *&recogidas, Nodo *&ma
         }
         auxiliar=auxiliar->siguiente;
         if(cartaDelMazo.valor!=-1){
-            if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa)){
+            if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
                 if(contarCartas(mesa)==0)
                     computadora.clarezas++;
@@ -1224,7 +1337,7 @@ void recogerPorCartaEspecifica(Figuras figuraARecoger, int valorARecoger, Nodo *
         }
         auxiliar=auxiliar->siguiente;
         if(cartaDelMazo.valor!=-1){
-            if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa)){
+            if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
                 if(contarCartas(mesa)==0)
                     ++computadora.clarezas;
@@ -1345,13 +1458,15 @@ void recogerEmparejamientoComputadora(Nodo *&mesa, Nodo *&recogidas, Nodo *&mazo
     computadora.idEmparejamiento==0;
 }
 //Todas las formas de recoger de la computadora
-void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora){
+void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora, Ultimo *ultimoEnRecogerPorEmparejamiento){
     for (int i = 1; i <=8; i++)
     {
         switch (i){
             case 1:
-                if(computadora.idEmparejamiento!=0)
+                if(computadora.idEmparejamiento!=0){
                     recogerEmparejamientoComputadora(mesa, recogidas, mazoComputadora, movimientoRealizado, computadora);
+                    *ultimoEnRecogerPorEmparejamiento = Computadora;
+                }
             break;
             case 2:
                 recogerPorCartaEspecifica(diamante,10,mesa, recogidas,mazoComputadora, computadora, movimientoRealizado);
@@ -1385,7 +1500,7 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
         cartaSeleccionada=buscarCartaPorPosicion(mazoComputadora,i);
         for(int j=1; j<=contarCartas(mesa); j++){
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
-            if (cartaPuedeEmparejarse(*computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa)){
+            if (cartaPuedeEmparejarse(*computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
                 if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == computadora->idEmparejamiento) //Condicion para quitarle el emparejado al jugador
                     computadora->idEmparejamiento = 0;
                 emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
@@ -1404,7 +1519,7 @@ void doblarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bo
         cartaSeleccionada=buscarCartaPorPosicion(mazoComputadora,i);
         for(int j=1; j<=contarCartas(mesa); j++){
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
-                 if (cartaPuedeDoblarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa)){
+                 if (cartaPuedeDoblarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
                     doblarCarta(mesa,mazoComputadora,cartaSeleccionada,cartaMesaSeleccionada);
                     movimientoRealizado = true;
                     break;
@@ -1426,14 +1541,14 @@ void lanzarCarta(Nodo *&mesa, Nodo *&cartasComputadora, short int contadorCartas
     } while (cartaSeleccionada.valor>10 && contarCartas(cartasComputadora)>1 && contadorCartasMesa==0); //Guardando la figura para la ultima jugada
     lanzarCartaEnMesa(mesa, cartasComputadora, cartaSeleccionada);
 }
-void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int &contadorCartasComputadora, short int &contadorCartasMesa, Jugador *computadora){
+void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int &contadorCartasComputadora, short int &contadorCartasMesa, Jugador *computadora, Ultimo *ultimoEnRecogerPorEmparejamiento){
     bool movimientoRealizado = false;
     for (int i = 1; i <=4 ; i++)
     {
         switch (i)
         {
             case 1:
-                recogerCartas(mesa, mazoComputadora, recogidas, movimientoRealizado, *computadora);
+                recogerCartas(mesa, mazoComputadora, recogidas, movimientoRealizado, *computadora, ultimoEnRecogerPorEmparejamiento);
             break;
             case 2:
                 if(computadora->idEmparejamiento==0)

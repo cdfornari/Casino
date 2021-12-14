@@ -1,15 +1,14 @@
 #include <iostream>
 #include <time.h>
-#include "libraries/Casino.h"
+#include "libraries/HandleFiles.h"
 
 using namespace std;
-
-Nodo *mazo = NULL;
-Nodo *cartasMesa = NULL;
-Jugador jugador;
-Jugador computadora;
-
-int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
+    
+int main (){
+    Nodo *mazo = NULL;
+    Nodo *cartasMesa = NULL;
+    Jugador jugador;
+    Jugador computadora;
     jugador.cartasMazo = NULL;
     jugador.clarezas = 0;
     jugador.idEmparejamiento = 0;
@@ -22,6 +21,7 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
     short int contadorCartasJugador;
     short int contadorCartasComputadora;
     short int *contadorCartasMesa = new short int;
+    Ultimo ultimoEnRecogerPorEmparejamiento = Null;
     do
     {
         limpiarConsola(isMac);
@@ -48,16 +48,51 @@ int main (){ //NO HACER TESTING EN LA MISMA EJECUCIÓN QUE JUGAR
                     do
                     {
                         if(reparte == 0){
-                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,&computadora);
-                            seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
+                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,&computadora,&ultimoEnRecogerPorEmparejamiento);
+                            seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                         }else{
-                            seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac);
-                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,&computadora);
+                            seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
+                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,&computadora,&ultimoEnRecogerPorEmparejamiento);
                         }
                         contadorCartasJugador--;
                         contadorCartasComputadora--;
                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                 } while (mazo != NULL);
+                if(cartasMesa != NULL)
+                    switch (ultimoEnRecogerPorEmparejamiento)
+                    {
+                        case Persona:
+                            while (cartasMesa != NULL)
+                            {
+                                insertarCartaEnMazo(jugador.cartasRecogidas,cartasMesa->carta);
+                                eliminarCartaDeMazo(cartasMesa,cartasMesa->carta);
+                            }
+                        break;
+                        case Computadora:
+                            while (cartasMesa != NULL)
+                            {
+                                insertarCartaEnMazo(computadora.cartasRecogidas,cartasMesa->carta);
+                                eliminarCartaDeMazo(cartasMesa,cartasMesa->carta);
+                            }
+                        break;
+                        default:
+                            while (cartasMesa != NULL && contarCartas(cartasMesa) > 1)
+                            {
+                                insertarCartaEnMazo(jugador.cartasRecogidas,cartasMesa->carta);
+                                eliminarCartaDeMazo(cartasMesa,cartasMesa->carta);
+                                insertarCartaEnMazo(computadora.cartasRecogidas,cartasMesa->carta);
+                                eliminarCartaDeMazo(cartasMesa,cartasMesa->carta);
+                            }
+                            if(contarCartas(cartasMesa) == 1)
+                                if (rand()%2 == 0){
+                                    insertarCartaEnMazo(jugador.cartasRecogidas,cartasMesa->carta);
+                                    eliminarCartaDeMazo(cartasMesa,cartasMesa->carta);
+                                }else{
+                                    insertarCartaEnMazo(computadora.cartasRecogidas,cartasMesa->carta);
+                                    eliminarCartaDeMazo(cartasMesa,cartasMesa->carta);
+                                }
+                        break;
+                    }
                 contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
             break;
             case '2':
