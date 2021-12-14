@@ -288,6 +288,44 @@ int contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora
             cout << "GANO COMPUTADORA\n";
 }
 
+void asignarCartasSobrantes(Nodo *&mesa, Jugador &jugador, Jugador &computadora, Ultimo ultimoEnRecogerPorEmparejamiento){
+    if(mesa != NULL)
+        switch (ultimoEnRecogerPorEmparejamiento)
+        {
+            case Persona:
+                while (mesa != NULL)
+                {
+                    insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                }
+            break;
+            case Computadora:
+                while (mesa != NULL)
+                {
+                    insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                }
+            break;
+            default:
+                while (mesa != NULL && contarCartas(mesa) > 1)
+                {
+                    insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                    insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                }
+                if(contarCartas(mesa) == 1)
+                    if (rand()%2 == 0){
+                        insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
+                        eliminarCartaDeMazo(mesa,mesa->carta);
+                    }else{
+                        insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
+                        eliminarCartaDeMazo(mesa,mesa->carta);
+                    }
+            break;
+        }
+}
+
 /******************* IMPRIMIR ***********************/
 
 void imprimirFigura (Carta carta){
