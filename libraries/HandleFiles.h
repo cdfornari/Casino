@@ -107,17 +107,17 @@ void insertarAlFinal(Nodo *&lista, Carta carta){
     }
 }
 //Funcion que permite convertir un texto a su correspondiente enum Ultimo
-Ultimo convertirUltimo(Ultimo &ultimoRecogerOJugar, string linea){
+void convertirUltimo(Ultimo &ultimoRecogerOJugar, string linea){
     char figura=linea[0];
     switch (figura){
     case '0':
-            return Persona;
+            ultimoRecogerOJugar=Persona;
         break;
     case '1':
-            return Computadora;
+            ultimoRecogerOJugar=Computadora;
         break;
     default:
-            return Null;
+            ultimoRecogerOJugar=Null;
         break;
     }
 }
