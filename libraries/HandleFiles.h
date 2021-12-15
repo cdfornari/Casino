@@ -107,7 +107,7 @@ void insertarAlFinal(Nodo *&lista, Carta carta){
     }
 }
 //Funcion que permite convertir un texto a su correspondiente enum Ultimo
-void convertirUltimo(Ultimo &ultimoRecogerOJugar, string linea){
+void convertirUltimo(Ultimo &ultimoRecogerOJugar, string &linea){
     char figura=linea[0];
     switch (figura){
     case '0':
@@ -224,8 +224,8 @@ void cargarReparte(short int &reparte, ifstream &archivo){
 void cargarUltimo(Ultimo &ultimoRecogerOJugar, ifstream &archivo){
     string linea="l";
     while(!archivo.eof() && linea!="///"){
-        if(linea!="///")
         getline(archivo, linea);
+        if(linea!="///")
         convertirUltimo(ultimoRecogerOJugar, linea);
     }
 }
