@@ -74,13 +74,13 @@ void vaciarUltimo(Ultimo ultimoRecogerOJugar, ofstream &archivo, bool &ok){
         archivo<<"///"<<endl;                 //Separa cada variable con un ///
 }
 
-void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Nodo *&jugadorCartasMazo, Nodo *&jugadorCartasRecogidas, Nodo *&computadoraCartasMazo, Nodo*&computadoraCartasRecogidas, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){ 
+void vaciarInformacion(Nodo *&mazo, Nodo *&cartasMesa, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){ 
     ofstream archivo;
     archivo.open(nombreArchivo.c_str(), ios::app); //Si no hay archivo, lo crea. 
     if(archivo.fail()){
        ok=false;
     } else {
-      vaciarLosMazos(mazo, cartasMesa, jugadorCartasMazo, jugadorCartasRecogidas, computadoraCartasMazo, computadoraCartasRecogidas, archivo, ok);
+      vaciarLosMazos(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, archivo, ok);
       vaciarLosJugadores(jugador, computadora, archivo, ok);
       vaciarReparte(reparte, archivo, ok);
       vaciarUltimo(ultimoEnRecogerPorEmparejamiento, archivo, ok);
@@ -214,6 +214,7 @@ void cargarJugador(Jugador &jugador, ifstream &archivo){
 void cargarReparte(short int &reparte, ifstream &archivo){
     string linea="l";
     while(!archivo.eof() && linea!="///"){
+        if(linea!="///")
         getline(archivo, linea);
         (linea=="0") ? reparte=0 : reparte=1;
     }
@@ -223,6 +224,7 @@ void cargarReparte(short int &reparte, ifstream &archivo){
 void cargarUltimo(Ultimo &ultimoRecogerOJugar, ifstream &archivo){
     string linea="l";
     while(!archivo.eof() && linea!="///"){
+        if(linea!="///")
         getline(archivo, linea);
         convertirUltimo(ultimoRecogerOJugar, linea);
     }
@@ -267,104 +269,11 @@ bool existeArchivo(){
     return existe;
 }
 
-/////////////////////////////////////////////////////////TESTING////////////////////////////////////////////////////////////////////
-
-/*
-
-Carta crearCarta(int valor, Figuras figura, char representacion, int puntaje, int id, int suma, bool doblada){
-    Carta carta;
-    carta.valor=valor;
-    carta.figura=figura;
-    carta.representacion=representacion;
-    carta.puntaje=puntaje;
-    carta.idEmparejamiento=id;
-    carta.sumaEmparejadas=suma;
-    carta.doblada=doblada;
-    return carta;
+void vaciarEnArchivo(Nodo *&mazo, Nodo *&cartasMesa, Jugador &jugador, Jugador &computadora, short int &reparte, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada, bool &ok){
+    if(!existeArchivo())
+        vaciarInformacion(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+    else {
+        borrarContenidoArchivo(ok);
+        vaciarInformacion(mazo, cartasMesa, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+        }
 }
-
-int main(){
-    Nodo *mazo=NULL;
-    Nodo *mesa=NULL;
-    Nodo *mazoJ=NULL;
-    Nodo *mazoC=NULL;
-    Nodo *mazoRC=NULL;
-    Nodo *mazoRJ=NULL;
-    Jugador *computadora=NULL;
-    Jugador *jugador=NULL;
-    bool ok=false;
-    bool recogio=false, reparte=false;
-    cargarInformacion(mazo,mesa,mazoJ,mazoRJ,mazoC,mazoRC,jugador,computadora,recogio,reparte);
-    
-    cout<<"Mazo"<<endl;
-    imprimirMazo(mazo);
-    cout<<"MESA\n"<<endl;
-    imprimirMazo(mesa);
-    cout<<"Mazo J\n"<<endl;
-    imprimirMazo(mazoJ);
-    cout<<"Mazo RJ\n"<<endl;
-    imprimirMazo(mazoRJ);
-    cout<<"Mazo C\n"<<endl;
-    imprimirMazo(mazoC);
-    cout<<"Mazo RC\n"<<endl;
-    imprimirMazo(mazoRC);
-    cout<<"Jugador Clarezas"<<jugador->clarezas<<endl;
-    cout<<"Jugador id"<<jugador->idEmparejamiento<<endl;
-   cout<<"Compu Clarezas"<<computadora->clarezas<<endl;
-    cout<<"Compu id"<<computadora->idEmparejamiento<<endl;
-    cout<<"Recogio"<<recogio<<endl;
-    cout<<"Reparte"<<reparte<<endl;
-
-    return 0;
-}
-
-
-*/
-
-
-/*
-
-int main(){
-    Nodo *mazo=NULL;
-    Nodo *mesa=NULL;
-    Nodo *mazoJ=NULL;
-    Nodo *mazoC=NULL;
-    Nodo *mazoRC=NULL;
-    Nodo *mazoRJ=NULL;
-    Jugador *computadora=new Jugador();
-    Jugador *jugador=new Jugador();
-
-    bool ok=false, reparte=true, recogio=false;
-    borrarContenidoArchivo(ok);
-    barajear(mazo);
-    repartirAMesa(mazo, mesa);
-    repartirAMesa(mazo, mesa);
-    repartirAMesa(mazo, mazoC);
-    repartirAMesa(mazo, mazoC);
-    repartirAMesa(mazo, mazoJ);
-    repartirAMesa(mazo, mazoJ);
-    repartirAMesa(mazo, mazoRC);
-    repartirAMesa(mazo, mazoRJ);
-    computadora->idEmparejamiento=777;
-    computadora->clarezas=2;
-    jugador->idEmparejamiento=0;
-    jugador->clarezas=1;
-
-    cout<<"Mazo"<<endl;
-    imprimirMazo(mazo);
-    cout<<"MESA\n"<<endl;
-    imprimirMazo(mesa);
-    cout<<"Mazo J\n"<<endl;
-    imprimirMazo(mazoJ);
-    cout<<"Mazo RJ\n"<<endl;
-    imprimirMazo(mazoRJ);
-    cout<<"Mazo C\n"<<endl;
-    imprimirMazo(mazoC);
-    cout<<"Mazo RC\n"<<endl;
-    imprimirMazo(mazoRC);
-    vaciarLosMazos(mazo,mesa,mazoJ,mazoRJ,mazoC, mazoRC,ok);
-    vaciarLosJugadores(jugador,computadora,ok);
-    vaciarTodasVariablesGlobales(reparte, recogio, ok);
-    return 0;
-} 
-*/

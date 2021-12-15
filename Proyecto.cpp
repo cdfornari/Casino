@@ -57,22 +57,21 @@ int main (){
                         if(reparte == 0){
                             movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Computadora;
+                            vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Persona;
+                            vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+
                         }else{
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Persona;
+                            vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                             movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Computadora;
+                            vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                         }
                         contadorCartasJugador--;
                         contadorCartasComputadora--;
-                        if(!existeArchivo())
-                            vaciarInformacion(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
-                        else {
-                            borrarContenidoArchivo(ok);
-                            vaciarInformacion(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
-                        }
                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                 } while (mazo != NULL);
                 asignarCartasSobrantes(cartasMesa,jugador,computadora,ultimoEnRecogerPorEmparejamiento);
@@ -142,7 +141,7 @@ int main (){
                         do
                         {
                             ultimoEnRealizarJugada = Null;
-                            repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
+                            //repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
                             contadorCartasJugador = 4;
                             contadorCartasComputadora = 4;
                             do
@@ -160,7 +159,7 @@ int main (){
                                 }
                                 contadorCartasJugador--;
                                 contadorCartasComputadora--;
-                            vaciarInformacion(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+                            vaciarInformacion(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                             } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                         } while (mazo != NULL);
                         asignarCartasSobrantes(cartasMesa,jugador,computadora,ultimoEnRecogerPorEmparejamiento);
