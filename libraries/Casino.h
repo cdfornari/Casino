@@ -1,4 +1,4 @@
-#include <iostream>
+ #include <iostream>
 #include <iomanip>
 #include <stdlib.h>
 #include <math.h>
@@ -192,12 +192,28 @@ Carta buscarCartaPorPosicion(Nodo *cartasJugador, short int posicionABuscar){
     return cartasJugador->carta;
 }
 
-Carta buscarCartaExacta(Nodo *mazo, Carta cartaAbuscar){
+Carta buscarCartaEspecifica(Nodo *mazo, Carta cartaAbuscar){
+    Carta carta;
     while(mazo!=NULL){
+        carta=mazo->carta;
         if(mazo->carta.valor==cartaAbuscar.valor && mazo->carta.figura==cartaAbuscar.figura)
-            return mazo->carta;
+            return carta;
         mazo=mazo->siguiente;
     }
+    carta.valor=-1;
+    return carta;
+}
+
+Carta buscarCartaPorFigura(Nodo *mazo, Figuras figuraABuscar){
+    Carta carta;
+    while(mazo!=NULL){
+        carta=mazo->carta;
+        if(mazo->carta.figura==figuraABuscar)
+            return carta;
+        mazo=mazo->siguiente;
+    }
+    carta.valor=-1;
+    return carta;
 }
 
 /******************* FUNCIONES DEL JUEGO ***********************/
@@ -366,6 +382,7 @@ void imprimirMazo(Nodo *mazo){
     }
     cout << endl;
 }
+
 //Funcion que vacia todos los elementos que contenga la lista
 void vaciarLista(Nodo *&lista){
     Nodo *auxiliar = lista;
@@ -375,6 +392,17 @@ void vaciarLista(Nodo *&lista){
         lista = lista->siguiente;
         delete auxiliar;
     }
+}
+
+void imprimirEmparejamientoEspecifico(Nodo *mesa, int id){
+    Nodo *emparejamiento=NULL;
+    while (mesa!=NULL){
+        if(mesa->carta.idEmparejamiento==id)
+            insertarCartaEnMazo(emparejamiento, mesa->carta);
+        mesa=mesa->siguiente;
+    }
+    imprimirMazo(emparejamiento);
+    vaciarLista(emparejamiento);
 }
 
 void imprimirEmparejamientos(Nodo *mesa){
@@ -1223,6 +1251,15 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
 
 /******************* FUNCIONES DE JUEGO PARA LA COMPUTADORA ***********************/
 
+//Funcion mostrar lo que recoge la computadora
+void cartasQueRecoge(Carta cartaDelMazo, Carta cartaDeMesa){
+    cout<<"\nRecogio con su carta ";
+    imprimirCarta(cartaDelMazo);
+    cout<< " la carta de la mesa ";
+    imprimirCarta(cartaDeMesa);
+    cout<<"\n";
+}
+
 //Funcion que retorna la cantidad de cartas que hay en un mazo. Considera un emparejamiento como una carta.
 int sumaMazo(Nodo *lista){ 
     int contador=0;
@@ -1278,83 +1315,50 @@ void reiniciarValores(Nodo *mazo, Nodo *cartasMesa, Jugador &jugador, Jugador &c
 //Recoger en la mesa las espadas, dandole prioridad al sumar el puntaje
 void recogerPorFigura(Figuras figuraARecoger, Nodo *&mesa, Nodo *&recogidas, Nodo *&mazoComputadora, Jugador &computadora, bool &movimientoRealizado){ //
     Carta cartaDeMesa, cartaDelMazo;
-    Nodo *auxiliar=mesa;
-    while(auxiliar!=NULL){
-        if(auxiliar->carta.figura == figuraARecoger){
-            cartaDeMesa=auxiliar->carta;
-            cartaDelMazo=buscarCarta(mazoComputadora, auxiliar->carta);
-        }
-        auxiliar=auxiliar->siguiente;
+    cartaDeMesa=buscarCartaPorFigura(mesa, figuraARecoger);
+    cartaDelMazo=buscarCarta(mazoComputadora, cartaDeMesa);
         if(cartaDelMazo.valor!=-1){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
+                cartasQueRecoge(cartaDelMazo, cartaDeMesa);
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
-                 cout<<"\nComputadora: ";
-                 cout<<"\nRecogio con su carta ";
-                 imprimirCarta(cartaDelMazo);
-                 cout<< " la carta de la mesa ";
-                 imprimirCarta(cartaDeMesa);
-                 cout<<"\n";
                 if(contarCartas(mesa)==0)
                     computadora.clarezas++;
                 movimientoRealizado=true;
-                break;
             }
         }      
-    }
 }
 
 void recogerPorValor(int valorARecoger, Nodo *&mesa, Nodo *&recogidas, Nodo *&mazoComputadora, Jugador &computadora, bool &movimientoRealizado){ //
-    Carta cartaDeMesa, cartaDelMazo;
-    Nodo *auxiliar=mesa;
-    while(auxiliar!=NULL){
-        if(auxiliar->carta.valor == valorARecoger){
-            cartaDeMesa=auxiliar->carta;
-            cartaDelMazo=buscarCarta(mazoComputadora, auxiliar->carta);
-        }
-        auxiliar=auxiliar->siguiente;
+    Carta cartaDeMesa, cartaDelMazo, cartaABuscar;
+    cartaABuscar.valor=valorARecoger;
+    cartaDeMesa=buscarCarta(mesa, cartaABuscar);
+    cartaDelMazo=buscarCarta(mazoComputadora,cartaDeMesa);
         if(cartaDelMazo.valor!=-1){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
-                cout<<"\nComputadora: ";
-                 cout<<"\nRecogio con su carta ";
-                 imprimirCarta(cartaDelMazo);
-                 cout<< " la carta de la mesa ";
-                 imprimirCarta(cartaDeMesa);
-                 cout<<"\n";
+                cartasQueRecoge(cartaDelMazo, cartaDeMesa);
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
                 if(contarCartas(mesa)==0)
                     computadora.clarezas++;
                 movimientoRealizado=true;
-                break;
             }
         }      
-    }
 }
 
 void recogerPorCartaEspecifica(Figuras figuraARecoger, int valorARecoger, Nodo *&mesa, Nodo *&recogidas, Nodo *&mazoComputadora, Jugador &computadora, bool &movimientoRealizado){ //
-    Carta cartaDeMesa, cartaDelMazo;
-    Nodo *auxiliar=mesa;
-    while(auxiliar!=NULL){
-        if(auxiliar->carta.valor == valorARecoger && auxiliar->carta.figura == figuraARecoger){
-            cartaDeMesa=auxiliar->carta;
-            cartaDelMazo=buscarCarta(mazoComputadora, auxiliar->carta);
-        }
-        auxiliar=auxiliar->siguiente;
+    Carta cartaDeMesa, cartaDelMazo, cartaAbuscar;
+    cartaAbuscar.valor=valorARecoger;
+    cartaAbuscar.figura=figuraARecoger;
+    cartaDeMesa=buscarCartaEspecifica(mesa, cartaAbuscar);
+    cartaDelMazo=buscarCarta(mazoComputadora, cartaDeMesa);
         if(cartaDelMazo.valor!=-1){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
+                 cartasQueRecoge(cartaDelMazo, cartaDeMesa);
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
-                cout<<"\nComputadora: ";
-                 cout<<"\nRecogio con su carta ";
-                 imprimirCarta(cartaDelMazo);
-                 cout<< " la carta de la mesa ";
-                 imprimirCarta(cartaDeMesa);
-                 cout<<"\n";
                 if(contarCartas(mesa)==0)
                     ++computadora.clarezas;
                 movimientoRealizado=true;
-                break;
             }
         }      
-    }
 }
 //Funcion que realiza todas las sumas posibles que puede recoger la computadora
 void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado){
@@ -1384,7 +1388,6 @@ void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogid
             eliminarCartaDeMazo(mazoComputadora, cartaDelMazo); //Se elimina carta del mazo jugador
             eliminarListaUsandoOtra(mesa, listaAuxiliar, recogidas); //Se inserta en las recogidas y elimina de la mesa
             insertarCartaEnMazo(recogidas,cartaDelMazo); //Se inserta la carta en mesa recogidas
-            cout<<"\nComputadora: ";
             cout<<"\nRecogio con su carta ";
             imprimirCarta(cartaDelMazo);
             cout<< " la suma de las siguientes cartas: ";
@@ -1436,12 +1439,11 @@ void utilizarCadaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &
     }
 
     if(movimientoRealizado){
-        cout<<"\nComputadora: ";
         cout<<"\nRecogio con su carta ";
         imprimirCarta(carta);
         cout<< " todas las cartas de la mesa iguales a ";
-        imprimirCarta(carta);
-        cout<<"\n";
+        (carta.representacion == '-') ? cout << carta.valor << setw(4) : cout << carta.representacion << setw(4);
+        cout<<"\n\n";
         insertarCartaEnMazo(recogidas, carta);
         eliminarCartaDeMazo(mazoJugador, carta);
     }
@@ -1456,12 +1458,7 @@ void recogerUnaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &mo
         Carta cartaQueSeRecoge=buscarCarta(mesa, cartaRecogiendo);
         auxiliar=auxiliar->siguiente;
         if(cartaQueSeRecoge.valor!=-1){
-            cout<<"\nComputadora: ";
-            cout<<"\nRecogio con su carta ";
-            imprimirCarta(cartaRecogiendo);
-            cout<< " la carta de la mesa ";
-            imprimirCarta(cartaQueSeRecoge);
-            cout<<"\n";
+            cartasQueRecoge(cartaRecogiendo, cartaQueSeRecoge);
             recogerCartaDeMesa(mesa, recogidas, mazoJugador, cartaRecogiendo, cartaQueSeRecoge);
             movimientoRealizado=true;
             if(contarCartas(mesa)==0)
@@ -1476,12 +1473,12 @@ void recogerEmparejamientoComputadora(Nodo *&mesa, Nodo *&recogidas, Nodo *&mazo
     Carta cartaABuscar;
     cartaABuscar.valor=cartaQueSeRecoge.sumaEmparejadas;
     Carta cartaRecogiendo=buscarCarta(mazoComputadora, cartaABuscar); //Busca la carta en el mazo de la compu el que tenga un valor igual a la suma 
-    recogerCartaDeMesa(mesa, recogidas, mazoComputadora, cartaRecogiendo, cartaQueSeRecoge);
-    cout<<"\nComputadora: ";
     cout<<"\nRecogio con su carta ";
     imprimirCarta(cartaRecogiendo);
     cout<< " el emparejamiento ";
+    imprimirEmparejamientoEspecifico(mesa, cartaQueSeRecoge.idEmparejamiento);
     cout<<"\n";
+    recogerCartaDeMesa(mesa, recogidas, mazoComputadora, cartaRecogiendo, cartaQueSeRecoge);
     movimientoRealizado=true;
     computadora.idEmparejamiento=0;
 }
@@ -1532,12 +1529,11 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
                 if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == computadora.idEmparejamiento) //Condicion para quitarle el emparejado al jugador
                     computadora.idEmparejamiento = 0;
                 emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
-                cartaConId=buscarCartaExacta(mesa, cartaSeleccionada);
+                cartaConId=buscarCartaEspecifica(mesa, cartaSeleccionada);
                 computadora.idEmparejamiento=cartaConId.idEmparejamiento;
-                 cout<<"\nComputadora: ";
                  cout<<"\nEmparejo la carta ";
                  imprimirCarta(cartaSeleccionada);
-                 cout<< " Con la carta de la mesa ";
+                 cout<< " con la carta de la mesa ";
                  imprimirCarta(cartaMesaSeleccionada);
                  cout<<"\n";
                 movimientoRealizado=true;
@@ -1556,10 +1552,9 @@ void doblarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bo
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
                  if (cartaPuedeDoblarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
                     doblarCarta(mesa,mazoComputadora,cartaSeleccionada,cartaMesaSeleccionada);
-                    cout<<"\nComputadora: ";
                     cout<<"\nDoblo la carta ";
                     imprimirCarta(cartaSeleccionada);
-                    cout<< " Con la carta de la mesa ";
+                    cout<< " con la carta de la mesa ";
                     imprimirCarta(cartaMesaSeleccionada);
                     cout<<"\n";
                     movimientoRealizado = true;
@@ -1580,15 +1575,16 @@ void lanzarCarta(Nodo *&mesa, Nodo *&cartasComputadora, short int &contadorCarta
                             //Guardando la figura para la ultima jugada
     lanzarCartaEnMesa(mesa, cartasComputadora, cartaSeleccionada);
     movimientoRealizado=true;
-    cout<<"\nComputadora: ";
     cout<<"\nLanzo la carta: ";
     imprimirCarta(cartaSeleccionada);
-    cout<<"\n";
+    cout<<"\n\n";
 }
 void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int &contadorCartasComputadora, short int &contadorCartasMesa, Jugador &computadora, Ultimo *ultimoEnRecogerPorEmparejamiento){
     bool movimientoRealizado = false;
     cout<<"\nCartas de la mesa: \n";
     imprimirMazo(mesa);
+    imprimirEmparejamientos(mesa);
+    cout<<"\nComputadora: ";
     for (int i = 1; i <=4 ; i++){
         switch (i){
             case 1:
