@@ -23,7 +23,6 @@ void imprimirMenuPrincipal(){
     cout << "1. Jugar partida nueva\n";
     cout << "2. Jugar partida anterior\n"; 
     cout << "3. Salir\n";
-    cout << "4. TESTING\n";
     cout << "Escoja una opcion\n";
 };
 //seleccionar una opcion del menu

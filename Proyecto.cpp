@@ -10,9 +10,11 @@ int main (){
     Jugador jugador;
     Jugador computadora;
     jugador.cartasMazo = NULL;
+    jugador.cartasRecogidas = NULL;
     jugador.clarezas = 0;
     jugador.idEmparejamiento = 0;
     computadora.cartasMazo = NULL;
+    computadora.cartasRecogidas = NULL;
     computadora.clarezas = 0;
     computadora.idEmparejamiento = 0;
     bool isMac = seleccionarSistemaOperativo();
@@ -65,8 +67,8 @@ int main (){
                         }
                         contadorCartasJugador--;
                         contadorCartasComputadora--;
-                       if(!existeArchivo())
-                        vaciarInformacion(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+                        if(!existeArchivo())
+                            vaciarInformacion(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                         else {
                             borrarContenidoArchivo(ok);
                             vaciarInformacion(mazo, cartasMesa, jugador.cartasMazo, jugador.cartasRecogidas, computadora.cartasMazo, computadora.cartasRecogidas, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -89,9 +91,9 @@ int main (){
                             contadorCartasComputadora = 4;
                         }else{
                             contadorCartasJugador = contarCartas(jugador.cartasMazo);
-                            contadorCartasComputadora = contarCartas(computadora.cartasMazo) == 0;
+                            contadorCartasComputadora = contarCartas(computadora.cartasMazo);
                         }
-                        if(ultimoEnRealizarJugada != Null)
+                        if(ultimoEnRealizarJugada != Null){
                             if (reparte == 0)
                             {
                                 if(ultimoEnRealizarJugada == Persona){
@@ -136,6 +138,7 @@ int main (){
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }
                             }
+                        }
                         do
                         {
                             ultimoEnRealizarJugada = Null;
@@ -164,21 +167,9 @@ int main (){
                         contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
                         reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
                     }else
-                        cout<<"\nNO pudo cargarse la partida. No existe el archivo\n";
+                        cout<<"\nNo pudo cargarse la partida. No existe el archivo\n";
             break;
             case '3':
-            break;
-            case '4':
-                srand(time(0));
-                barajear(mazo);
-                imprimirMazo(mazo);
-                repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
-                cout << "Jugador" << endl;
-                imprimirMazo(jugador.cartasMazo);
-                cout << "Computadora" << endl;
-                imprimirMazo(computadora.cartasMazo);
-                cout << "mazo despues de repartir" << endl;
-                imprimirMazo(mazo);
             break;
             default:
                 cout << "Seleccione una opcion correcta\n";

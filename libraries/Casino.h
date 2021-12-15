@@ -366,6 +366,16 @@ void imprimirMazo(Nodo *mazo){
     }
     cout << endl;
 }
+//Funcion que vacia todos los elementos que contenga la lista
+void vaciarLista(Nodo *&lista){
+    Nodo *auxiliar = lista;
+    while (lista!= NULL)
+    {
+        auxiliar=lista;
+        lista = lista->siguiente;
+        delete auxiliar;
+    }
+}
 
 void imprimirEmparejamientos(Nodo *mesa){
     Nodo *emparejamiento1 = NULL;
@@ -487,6 +497,7 @@ void recogerVariasCartasDeMesa(Nodo *&mesa, Nodo *&recogidas,Nodo *&mazoJugador,
     {
         insertarCartaEnMazo(recogidas,cartasQueSeRecogen->carta);
         eliminarCartaDeMazo(mesa,cartasQueSeRecogen->carta);
+        cartasQueSeRecogen = cartasQueSeRecogen->siguiente;
     }
 }
 
@@ -516,6 +527,7 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
                     cout << "No puedes recoger cartas numericas con figuras" << endl;
                 return false;
             }
+            auxiliar=auxiliar->siguiente;
         }
         //Verificar que sean la misma figura
         auxiliar = cartasQueSeRecogen;
@@ -526,6 +538,7 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
                     cout << "Solo se pueden recoger figuras iguales" << endl;
                 return false;
             }
+            auxiliar=auxiliar->siguiente;
         }
         if(contarCartas(cartasQueSeRecogen) == 2){ //2 + la del mazo del jugador
             if(mostrarMensajeDeError)
@@ -798,6 +811,7 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                     cout << "No puedes emparejar figuras con cartas numericas" << endl;
                 return false;
             }
+            auxiliar=auxiliar->siguiente;
         }
         //Verificar que sean la misma figura
         auxiliar = cartasQueSeEmparejan;
@@ -808,6 +822,7 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                     cout << "Solo se pueden recoger figuras iguales" << endl;
                 return false;
             }
+            auxiliar=auxiliar->siguiente;
         }
         if(contarCartas(cartasQueSeEmparejan) == 3){ //3 + la del mazo del jugador
             if(mostrarMensajeDeError)
@@ -1012,8 +1027,8 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
     int cantidadCartasEmparejar;
     short int posicionCartaSeleccionada;
     Carta cartaSeleccionada;
-    Nodo *cartasParaRecoger;
-    Nodo *cartasParaEmparejar;
+    Nodo *cartasParaRecoger = NULL;
+    Nodo *cartasParaEmparejar = NULL;
     do
     {
         //limpiarConsola(isMac);
@@ -1046,7 +1061,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 cout << "Que carta desea usar para emparejar?" << endl;
                 posicionCartaSeleccionada = seleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador);
                 cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicionCartaSeleccionada);
-                cout << "Cuantas cartas desea emparejar?" << endl;
+                cout << "Con cuantas cartas desea emparejar?" << endl;
                 do
                 {
                     cin >> cantidadCartasEmparejar;
@@ -1104,6 +1119,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         *contadorCartasMesa = contarCartas(mesa);
                         *movimientoValido = true;
                     }
+                    vaciarLista(cartasParaEmparejar);
                 }
             break;
             case '3':
@@ -1175,7 +1191,8 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         if(*contadorCartasMesa == 0)
                             jugador->clarezas++;
                         *movimientoValido = true;
-                    }        
+                    }
+                    vaciarLista(cartasParaRecoger);        
                 }
             break;
             case '4':
@@ -1241,16 +1258,6 @@ void eliminarListaUsandoOtra(Nodo *&mesa, Nodo *auxiliar, Nodo *&recogidas){
         insertarCartaEnMazo(recogidas, carta);
         eliminarCartaDeMazo(mesa, carta);
         auxiliar=auxiliar->siguiente;
-    }
-}
-//Funcion que vacia todos los elementos que contenga la lista
-void vaciarLista(Nodo *&lista){
-    Nodo *auxiliar = lista;
-    while (lista!= NULL)
-    {
-        auxiliar=lista;
-        lista = lista->siguiente;
-        delete auxiliar;
     }
 }
 //Funcion que vacia todos los elementos que contenga la lista
