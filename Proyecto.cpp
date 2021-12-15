@@ -141,7 +141,7 @@ int main (){
                         do
                         {
                             ultimoEnRealizarJugada = Null;
-                            //repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
+                         //   repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
                             contadorCartasJugador = 4;
                             contadorCartasComputadora = 4;
                             do
