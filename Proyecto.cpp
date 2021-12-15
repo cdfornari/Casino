@@ -138,10 +138,10 @@ int main (){
                                 }
                             }
                         }
-                        do
+                        while (mazo != NULL)
                         {
                             ultimoEnRealizarJugada = Null;
-                         //   repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
+                            repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
                             contadorCartasJugador = 4;
                             contadorCartasComputadora = 4;
                             do
@@ -161,7 +161,7 @@ int main (){
                                 contadorCartasComputadora--;
                             vaciarInformacion(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                             } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
-                        } while (mazo != NULL);
+                        }
                         asignarCartasSobrantes(cartasMesa,jugador,computadora,ultimoEnRecogerPorEmparejamiento);
                         contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
                         reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
