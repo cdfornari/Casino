@@ -1015,6 +1015,11 @@ bool cartaPuedeDoblarse(Jugador jugador, Carta cartaADoblar, Carta cartaConLaQue
             return false;
         }else
             cartaABuscar.valor = cartaConLaQueSeDobla.sumaEmparejadas;
+    if(jugador.idEmparejamiento != 0 && jugador.idEmparejamiento != cartaConLaQueSeDobla.idEmparejamiento){
+        if(mostrarMensajeDeError)
+            cout << "No puedes doblar otro emparejamiento que no sea el que tienes activo" << endl;
+        return false;
+    }
     if(contarCartasPorValor(jugador.cartasMazo,cartaABuscar.valor) < 2){
         if(mostrarMensajeDeError)
             cout << "No puedes emparejar porque no tienes otra carta con la que recoger el emparejamiento doblado" << endl;
@@ -1059,7 +1064,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
     Nodo *cartasParaEmparejar = NULL;
     do
     {
-        //limpiarConsola(isMac);
+        limpiarConsola(isMac);
         cout << "Tus cartas:\n";
         imprimirMazo(cartasJugador);
         cout << "Cartas en la mesa:\n";
@@ -1071,6 +1076,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
         cout << "3. Recoger una carta o varias cartas o un emparejamiento" << endl;
         cout << "4. Doblar o proteger carta o emparejamiento" << endl;
         *opcionSeleccionada = seleccionarOpcion();
+        limpiarConsola(isMac);
         switch (*opcionSeleccionada)
         {
             case '1':
@@ -1081,6 +1087,9 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                     posicionCartaSeleccionada = seleccionarCartaPorPosicion(cartasJugador,contadorCartasJugador);
                     cartaSeleccionada = buscarCartaPorPosicion(cartasJugador, posicionCartaSeleccionada);
                     lanzarCartaEnMesa(mesa, cartasJugador, cartaSeleccionada);
+                    cout << "El jugador lanzo a la mesa la carta ";
+                    imprimirCarta(cartaSeleccionada);
+                    cout << endl;
                     (*contadorCartasMesa)++;
                     *movimientoValido = true;
                 }
@@ -1109,19 +1118,30 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                     {
                         if((*cartaMesaSeleccionada).idEmparejamiento != 0 && (*cartaMesaSeleccionada).idEmparejamiento == (*computadora).idEmparejamiento)
                             computadora->idEmparejamiento = 0;
-                        jugador->idEmparejamiento = cartaMesaSeleccionada->idEmparejamiento;
                         emparejarCarta(mesa,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
+                        jugador->idEmparejamiento = cartaMesaSeleccionada->idEmparejamiento;
+                        cout << "El jugador emparejo su carta ";
+                        imprimirCarta(cartaSeleccionada);
+                        cout << " con la carta de la mesa ";
+                        imprimirCarta(*cartaMesaSeleccionada);
+                        if(cartaMesaSeleccionada->idEmparejamiento != 0)
+                            cout << " (incluyendo a sus emparejadas)";
+                        cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         *movimientoValido = true;
                     }
                 }
                 else
                 {
-                    cout << "Con que cartas desea emparejar?" << endl;
                     for (int i = 0; i < cantidadCartasEmparejar; i++)
                     {
+                        limpiarConsola(isMac);
+                        cout << "Con que cartas desea emparejar?" << endl;
                         cout << "Seleccionadas: " << endl;
-                        imprimirMazo(cartasParaEmparejar);
+                        if(cartasParaEmparejar == NULL)
+                            cout << "No has seleccionado cartas" << endl;
+                        else
+                            imprimirMazo(cartasParaEmparejar);
                         do
                         {
                             *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
@@ -1138,12 +1158,19 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         while (auxiliar != NULL)
                         {
                             if(auxiliar->carta.idEmparejamiento != 0 ){
-                                jugador->idEmparejamiento = auxiliar->carta.idEmparejamiento;
                                 if (auxiliar->carta.idEmparejamiento == (*computadora).idEmparejamiento)
                                     computadora->idEmparejamiento = 0;
-                            }           
+                                break;
+                            }
+                            auxiliar = auxiliar->siguiente;           
                         }
                         emparejarMultiplesCartas(mesa,cartasJugador,cartaSeleccionada,cartasParaEmparejar);
+                        jugador->idEmparejamiento = cartasParaEmparejar->carta.idEmparejamiento;
+                        cout << "El jugador emparejo su carta ";
+                        imprimirCarta(cartaSeleccionada);
+                        cout << " con las cartas de la mesa ";
+                        imprimirMazo(cartasParaEmparejar);
+                        cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         *movimientoValido = true;
                     }
@@ -1180,6 +1207,13 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                                 (*computadora).idEmparejamiento = 0;
                         }
                         recogerCartaDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
+                        cout << "El jugador recogio la carta de la mesa ";
+                        imprimirCarta(*cartaMesaSeleccionada);
+                        cout << " con su carta ";
+                        imprimirCarta(cartaSeleccionada);
+                        if(cartaMesaSeleccionada->idEmparejamiento != 0)
+                            cout << " (incluyendo a sus emparejadas)";
+                        cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         if(*contadorCartasMesa == 0)
                             jugador->clarezas++;
@@ -1188,11 +1222,15 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 }
                 else
                 {
-                    cout << "Que cartas desea recoger?" << endl;
                     for (int i = 0; i < cantidadCartasRecoger; i++)
                     {
+                        limpiarConsola(isMac);
+                        cout << "Que cartas desea recoger?" << endl;
                         cout << "Seleccionadas: " << endl;
-                        imprimirMazo(cartasParaRecoger);
+                        if(cartasParaRecoger == NULL)
+                            cout << "No has seleccionado cartas" << endl;
+                        else
+                            imprimirMazo(cartasParaRecoger);
                         do
                         {
                             *posicionCartaDeMesa = seleccionarCartaPorPosicion(mesa,*contadorCartasMesa);
@@ -1213,8 +1251,14 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                                     (*computadora).idEmparejamiento = 0;
                                 break;
                             }
+                            auxiliar = auxiliar->siguiente;
                         }
                         recogerVariasCartasDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,cartasParaRecoger);
+                        cout << "El jugador recogio las cartas de la mesa ";
+                        imprimirMazo(cartasParaRecoger);
+                        cout << " con su carta ";
+                        imprimirCarta(cartaSeleccionada);
+                        cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         if(*contadorCartasMesa == 0)
                             jugador->clarezas++;
@@ -1233,6 +1277,14 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 if (cartaPuedeDoblarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa,true))
                 {
                     doblarCarta(mesa,jugador->cartasMazo,cartaSeleccionada,*cartaMesaSeleccionada);
+                    jugador->idEmparejamiento = cartaMesaSeleccionada->idEmparejamiento;
+                    cout << "El jugador doblo la carta de la mesa ";
+                    imprimirCarta(*cartaMesaSeleccionada);
+                    cout << " con su carta ";
+                    imprimirCarta(cartaSeleccionada);
+                    if(cartaMesaSeleccionada->idEmparejamiento != 0)
+                        cout << " (incluyendo a sus emparejadas)";
+                    cout << endl;
                     *contadorCartasMesa = contarCartas(mesa);
                     *movimientoValido = true;
                 }
@@ -1242,6 +1294,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
             break;
         }
         pausarConsola();
+        limpiarConsola(isMac);
     } while (!*movimientoValido);
     delete movimientoValido;
     delete opcionSeleccionada;
@@ -1388,7 +1441,7 @@ void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogid
             eliminarCartaDeMazo(mazoComputadora, cartaDelMazo); //Se elimina carta del mazo jugador
             eliminarListaUsandoOtra(mesa, listaAuxiliar, recogidas); //Se inserta en las recogidas y elimina de la mesa
             insertarCartaEnMazo(recogidas,cartaDelMazo); //Se inserta la carta en mesa recogidas
-            cout<<"\nRecogio con su carta ";
+            cout<<"recogio con su carta ";
             imprimirCarta(cartaDelMazo);
             cout<< " la suma de las siguientes cartas: ";
             imprimirMazo(listaAuxiliar);
@@ -1439,7 +1492,7 @@ void utilizarCadaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &
     }
 
     if(movimientoRealizado){
-        cout<<"\nRecogio con su carta ";
+        cout<<"recogio con su carta ";
         imprimirCarta(carta);
         cout<< " todas las cartas de la mesa iguales a ";
         (carta.representacion == '-') ? cout << carta.valor << setw(4) : cout << carta.representacion << setw(4);
@@ -1473,7 +1526,7 @@ void recogerEmparejamientoComputadora(Nodo *&mesa, Nodo *&recogidas, Nodo *&mazo
     Carta cartaABuscar;
     cartaABuscar.valor=cartaQueSeRecoge.sumaEmparejadas;
     Carta cartaRecogiendo=buscarCarta(mazoComputadora, cartaABuscar); //Busca la carta en el mazo de la compu el que tenga un valor igual a la suma 
-    cout<<"\nRecogio con su carta ";
+    cout<<"recogio con su carta ";
     imprimirCarta(cartaRecogiendo);
     cout<< " el emparejamiento ";
     imprimirEmparejamientoEspecifico(mesa, cartaQueSeRecoge.idEmparejamiento);
@@ -1531,7 +1584,7 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
                 emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
                 cartaConId=buscarCartaEspecifica(mesa, cartaSeleccionada);
                 computadora.idEmparejamiento=cartaConId.idEmparejamiento;
-                 cout<<"\nEmparejo la carta ";
+                 cout<<"emparejo la carta ";
                  imprimirCarta(cartaSeleccionada);
                  cout<< " con la carta de la mesa ";
                  imprimirCarta(cartaMesaSeleccionada);
@@ -1552,7 +1605,7 @@ void doblarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bo
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
                  if (cartaPuedeDoblarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
                     doblarCarta(mesa,mazoComputadora,cartaSeleccionada,cartaMesaSeleccionada);
-                    cout<<"\nDoblo la carta ";
+                    cout<<"doblo la carta ";
                     imprimirCarta(cartaSeleccionada);
                     cout<< " con la carta de la mesa ";
                     imprimirCarta(cartaMesaSeleccionada);
@@ -1575,7 +1628,7 @@ void lanzarCarta(Nodo *&mesa, Nodo *&cartasComputadora, short int &contadorCarta
                             //Guardando la figura para la ultima jugada
     lanzarCartaEnMesa(mesa, cartasComputadora, cartaSeleccionada);
     movimientoRealizado=true;
-    cout<<"\nLanzo la carta: ";
+    cout<<"lanzo la carta ";
     imprimirCarta(cartaSeleccionada);
     cout<<"\n\n";
 }
@@ -1584,7 +1637,7 @@ void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogida
     cout<<"\nCartas de la mesa: \n";
     imprimirMazo(mesa);
     imprimirEmparejamientos(mesa);
-    cout<<"\nComputadora: ";
+    cout<<"\nLa computadora ";
     for (int i = 1; i <=4 ; i++){
         switch (i){
             case 1:

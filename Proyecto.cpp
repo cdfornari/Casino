@@ -17,7 +17,6 @@ int main (){
     computadora.cartasRecogidas = NULL;
     computadora.clarezas = 0;
     computadora.idEmparejamiento = 0;
-    bool isMac = seleccionarSistemaOperativo();
     bool opcionNuevaPartida = false;
     bool ok = false;
     char opcionSeleccionada;
@@ -27,11 +26,13 @@ int main (){
     short int *contadorCartasMesa = new short int;
     Ultimo ultimoEnRecogerPorEmparejamiento = Null;
     Ultimo ultimoEnRealizarJugada = Null;
+    bool isMac = seleccionarSistemaOperativo();
+    limpiarConsola(isMac);
     do
     {   
-        limpiarConsola(isMac);
         imprimirMenuPrincipal();
         opcionSeleccionada = seleccionarOpcion();
+        limpiarConsola(isMac);
         switch (opcionSeleccionada)
         {
             case '1':
@@ -175,6 +176,7 @@ int main (){
             break;
         }
         pausarConsola();
+        limpiarConsola(isMac);
     } while (opcionSeleccionada != '3');
     delete contadorCartasMesa;
     
