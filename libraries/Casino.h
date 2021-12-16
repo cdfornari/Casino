@@ -1355,7 +1355,7 @@ void eliminarListaUsandoOtra(Nodo *&mesa, Nodo *auxiliar, Nodo *&recogidas){
     }
 }
 //Funcion que vacia todos los elementos que contenga la lista
-void reiniciarValores(Nodo *mazo, Nodo *cartasMesa, Jugador &jugador, Jugador &computadora, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada){
+void reiniciarValores(Nodo *&mazo, Nodo *&cartasMesa, Jugador &jugador, Jugador &computadora, Ultimo &ultimoEnRecogerPorEmparejamiento, Ultimo &ultimoEnRealizarJugada){
     vaciarLista(mazo);
     vaciarLista(cartasMesa);
     jugador.clarezas = 0;
@@ -1533,19 +1533,17 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
             if (cartaPuedeEmparejarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
                 if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == jugador.idEmparejamiento) 
-                    jugador.idEmparejamiento = 0;
-                emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
-                cartaConId=buscarCartaEspecifica(mesa, cartaSeleccionada);
-                computadora.idEmparejamiento=cartaConId.idEmparejamiento;
-                 cout<<"La computadora emparejo la carta ";
-                 imprimirCarta(cartaSeleccionada);
-                 cout<< " con la carta de la mesa ";
-                 imprimirCarta(cartaMesaSeleccionada);
-                 cout<<"\n";
-                movimientoRealizado=true;
-                break;
+                    jugador.idEmparejamiento = 0;  
+                    computadora.idEmparejamiento=emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
+                    cout<<"La computadora emparejo la carta ";
+                    imprimirCarta(cartaSeleccionada);
+                    cout<< " con la carta de la mesa ";
+                    imprimirCarta(cartaMesaSeleccionada);
+                    cout<<"\n";
+                    movimientoRealizado=true;
+                    break;
+                }
             }
-        }
         if(movimientoRealizado)  break;
     }
 }

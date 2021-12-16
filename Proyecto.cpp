@@ -17,7 +17,6 @@ int main (){
     computadora.cartasRecogidas = NULL;
     computadora.clarezas = 0;
     computadora.idEmparejamiento = 0;
-    bool opcionNuevaPartida = false;
     bool ok = false;
     char opcionSeleccionada;
     short int reparte;
@@ -36,7 +35,6 @@ int main (){
         switch (opcionSeleccionada)
         {
             case '1':
-                opcionNuevaPartida=true;
                 srand(time(0));
                 barajear(mazo);
                 repartirAMesa(mazo,cartasMesa);
@@ -77,8 +75,8 @@ int main (){
                 } while (mazo != NULL);
                 asignarCartasSobrantes(cartasMesa,jugador,computadora,ultimoEnRecogerPorEmparejamiento);
                 contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
-                reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
-            break;
+                reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);   
+                vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok); break;
             case '2':
                     if(existeArchivo()){
                         cargarInformacion(mazo, cartasMesa, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
@@ -177,6 +175,7 @@ int main (){
                         asignarCartasSobrantes(cartasMesa,jugador,computadora,ultimoEnRecogerPorEmparejamiento);
                         contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
                         reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
+                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                     }else
                         cout<<"\nNo pudo cargarse la partida. No existe el archivo\n";
             break;
