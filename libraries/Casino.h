@@ -1070,7 +1070,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
         cout << "Cartas en la mesa:\n";
         imprimirMazo(mesa);
         imprimirEmparejamientos(mesa);
-        cout << "Que jugada quiere realizar?" << endl;
+        cout << "\nQue jugada quiere realizar?" << endl;
         cout << "1. Lanzar carta en mesa" << endl;
         cout << "2. Emparejar una o varias cartas" << endl;
         cout << "3. Recoger una carta o varias cartas o un emparejamiento" << endl;
@@ -1370,7 +1370,7 @@ void recogerPorFigura(Figuras figuraARecoger, Nodo *&mesa, Nodo *&recogidas, Nod
     Carta cartaDeMesa, cartaDelMazo;
     cartaDeMesa=buscarCartaPorFigura(mesa, figuraARecoger);
     cartaDelMazo=buscarCarta(mazoComputadora, cartaDeMesa);
-        if(cartaDelMazo.valor!=-1){
+        if(cartaDelMazo.valor!=-1 && cartaDeMesa.idEmparejamiento==0){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
                 cartasQueRecoge(cartaDelMazo, cartaDeMesa);
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
@@ -1386,7 +1386,7 @@ void recogerPorValor(int valorARecoger, Nodo *&mesa, Nodo *&recogidas, Nodo *&ma
     cartaABuscar.valor=valorARecoger;
     cartaDeMesa=buscarCarta(mesa, cartaABuscar);
     cartaDelMazo=buscarCarta(mazoComputadora,cartaDeMesa);
-        if(cartaDelMazo.valor!=-1){
+        if(cartaDelMazo.valor!=-1 && cartaDeMesa.idEmparejamiento==0){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
                 cartasQueRecoge(cartaDelMazo, cartaDeMesa);
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
@@ -1403,7 +1403,7 @@ void recogerPorCartaEspecifica(Figuras figuraARecoger, int valorARecoger, Nodo *
     cartaAbuscar.figura=figuraARecoger;
     cartaDeMesa=buscarCartaEspecifica(mesa, cartaAbuscar);
     cartaDelMazo=buscarCarta(mazoComputadora, cartaDeMesa);
-        if(cartaDelMazo.valor!=-1){
+        if(cartaDelMazo.valor!=-1 && cartaDeMesa.idEmparejamiento==0){
             if (cartaPuedeRecogerse(cartaDelMazo,cartaDeMesa,mesa,computadora,false)){
                  cartasQueRecoge(cartaDelMazo, cartaDeMesa);
                 recogerCartaDeMesa(mesa,recogidas,mazoComputadora,cartaDelMazo,cartaDeMesa);
@@ -1452,55 +1452,6 @@ void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogid
         vaciarLista(listaAuxiliar);   
     }
 }
-//Eliminar cartas de un mismo valor repetidas de un mazo. (Usado para recoger varias cartas en la mesa iguales con la que tienes)
-void eliminarCartasRepetidasEnUnMazo(Nodo *&mesa, Nodo *&recogidas, Carta carta, bool &movimientoRealizado){
-    Carta cartaEliminada;
-    Nodo *auxiliar=mesa;
-    Nodo *anterior=NULL;
-    do{
-        if(mesa->carta.valor==carta.valor && mesa->carta.idEmparejamiento==0){
-            insertarCartaEnMazo(recogidas, mesa->carta);
-            mesa=mesa->siguiente;
-            delete auxiliar;
-            movimientoRealizado=true;
-            auxiliar=mesa;
-        }
-    } while (mesa->carta.valor==carta.valor);
-
-    while(auxiliar!=NULL){
-        if(auxiliar->carta.valor == carta.valor && mesa->carta.idEmparejamiento==0){
-            insertarCartaEnMazo(recogidas, auxiliar->carta);
-            anterior->siguiente=auxiliar->siguiente;
-            delete auxiliar;
-            movimientoRealizado=true;
-            auxiliar=anterior;
-        }
-        anterior=auxiliar;
-        auxiliar=auxiliar->siguiente;
-    }
-}
-//Funcion que recorre el mazo de la computadora si encuentra la oportunidad de recoger cartas iguales
-void utilizarCadaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &movimientoRealizado){
-    Carta carta;
-    Nodo *auxiliar=mazoJugador;
-    while (auxiliar!=NULL)
-    {
-        carta=auxiliar->carta;
-        eliminarCartasRepetidasEnUnMazo(mesa, recogidas, carta, movimientoRealizado);
-        if(movimientoRealizado)  break;
-        auxiliar=auxiliar->siguiente;
-    }
-
-    if(movimientoRealizado){
-        cout<<"recogio con su carta ";
-        imprimirCarta(carta);
-        cout<< " todas las cartas de la mesa iguales a ";
-        (carta.representacion == '-') ? cout << carta.valor << setw(4) : cout << carta.representacion << setw(4);
-        cout<<"\n\n";
-        insertarCartaEnMazo(recogidas, carta);
-        eliminarCartaDeMazo(mazoJugador, carta);
-    }
-}
 //Funcion que recoge una carta igual
 void recogerUnaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora){
     Nodo *auxiliar=mazoJugador;
@@ -1510,12 +1461,14 @@ void recogerUnaCarta(Nodo *&mesa, Nodo *&mazoJugador, Nodo *&recogidas, bool &mo
         cartaRecogiendo=auxiliar->carta;
         Carta cartaQueSeRecoge=buscarCarta(mesa, cartaRecogiendo);
         auxiliar=auxiliar->siguiente;
-        if(cartaQueSeRecoge.valor!=-1){
-            cartasQueRecoge(cartaRecogiendo, cartaQueSeRecoge);
-            recogerCartaDeMesa(mesa, recogidas, mazoJugador, cartaRecogiendo, cartaQueSeRecoge);
-            movimientoRealizado=true;
-            if(contarCartas(mesa)==0)
-                ++computadora.clarezas;
+        if(cartaQueSeRecoge.valor!=-1 && cartaQueSeRecoge.idEmparejamiento==0){
+            if(cartaPuedeRecogerse(cartaRecogiendo,cartaQueSeRecoge,mesa,computadora,false)){
+                cartasQueRecoge(cartaRecogiendo, cartaQueSeRecoge);
+                recogerCartaDeMesa(mesa, recogidas, mazoJugador, cartaRecogiendo, cartaQueSeRecoge);
+                movimientoRealizado=true;
+                if(contarCartas(mesa)==0)
+                    ++computadora.clarezas;
+            } 
         }
         if(movimientoRealizado) break;
     }
@@ -1537,13 +1490,13 @@ void recogerEmparejamientoComputadora(Nodo *&mesa, Nodo *&recogidas, Nodo *&mazo
 }
 //Todas las formas de recoger de la computadora
 void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora, Ultimo *ultimoEnRecogerPorEmparejamiento){
-    for (int i = 1; i <=8; i++)
+    for (int i = 1; i <=7; i++)
     {
         switch (i){
             case 1:
                 if(computadora.idEmparejamiento!=0){
-                    recogerEmparejamientoComputadora(mesa, recogidas, mazoComputadora, movimientoRealizado, computadora);
-                    *ultimoEnRecogerPorEmparejamiento = Computadora;
+                recogerEmparejamientoComputadora(mesa, recogidas, mazoComputadora, movimientoRealizado, computadora);
+                *ultimoEnRecogerPorEmparejamiento = Computadora;
                 }
             break;
             case 2:
@@ -1559,9 +1512,6 @@ void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &
                 recogerPorFigura(espada,mesa, recogidas,mazoComputadora, computadora, movimientoRealizado);
             break;
             case 6:
-                utilizarCadaCarta(mesa, mazoComputadora,recogidas, movimientoRealizado);
-            break;
-            case 7:
                 recogerSumasComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado);
             break;      
             default:
@@ -1572,15 +1522,15 @@ void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &
     }
 }
 //Emparejar
-void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora){
+void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado, Jugador &computadora, Jugador &jugador){
     Carta cartaMesaSeleccionada, cartaSeleccionada, cartaConId;
     for (int i = 1; i <= contarCartas(mazoComputadora); i++){
         cartaSeleccionada=buscarCartaPorPosicion(mazoComputadora,i);
         for(int j=1; j<=contarCartas(mesa); j++){
             cartaMesaSeleccionada=buscarCartaPorPosicion(mesa, j);
             if (cartaPuedeEmparejarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
-                if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == computadora.idEmparejamiento) //Condicion para quitarle el emparejado al jugador
-                    computadora.idEmparejamiento = 0;
+                if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == jugador.idEmparejamiento) 
+                    jugador.idEmparejamiento = 0;
                 emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
                 cartaConId=buscarCartaEspecifica(mesa, cartaSeleccionada);
                 computadora.idEmparejamiento=cartaConId.idEmparejamiento;
@@ -1625,14 +1575,13 @@ void lanzarCarta(Nodo *&mesa, Nodo *&cartasComputadora, short int &contadorCarta
           posicionCartaSeleccionada=rand()%10;
         } while (posicionCartaSeleccionada < 1 || posicionCartaSeleccionada > contadorCartasComputadora);
         cartaSeleccionada = buscarCartaPorPosicion(cartasComputadora, posicionCartaSeleccionada);
-                            //Guardando la figura para la ultima jugada
     lanzarCartaEnMesa(mesa, cartasComputadora, cartaSeleccionada);
     movimientoRealizado=true;
     cout<<"lanzo la carta ";
     imprimirCarta(cartaSeleccionada);
     cout<<"\n\n";
 }
-void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int &contadorCartasComputadora, short int &contadorCartasMesa, Jugador &computadora, Ultimo *ultimoEnRecogerPorEmparejamiento){
+void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, short int &contadorCartasComputadora, short int &contadorCartasMesa, Jugador &computadora, Jugador &jugador, Ultimo *ultimoEnRecogerPorEmparejamiento){
     bool movimientoRealizado = false;
     cout<<"\nCartas de la mesa: \n";
     imprimirMazo(mesa);
@@ -1645,7 +1594,7 @@ void movimientosComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogida
             break;
             case 2:
                 if(computadora.idEmparejamiento==0)
-                    emparejarComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
+                    emparejarComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora, jugador);
             break;
             case 3:
                 doblarComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);

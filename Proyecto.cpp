@@ -56,7 +56,7 @@ int main (){
                     do
                     {
                         if(reparte == 0){
-                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Computadora;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
@@ -67,7 +67,7 @@ int main (){
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Persona;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
-                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Computadora;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                         }
@@ -99,19 +99,23 @@ int main (){
                                 if(ultimoEnRealizarJugada == Persona){
                                     do
                                     {
-                                        movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                                        movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Computadora;
+                                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                         seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Persona;
+                                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }else{
                                     do
                                     {                                        
                                         seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Persona;
+                                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                         if(computadora.cartasMazo != NULL){
-                                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                                            movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                             ultimoEnRealizarJugada = Computadora;
+                                            vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                         }
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }
@@ -121,11 +125,13 @@ int main (){
                                 if(ultimoEnRealizarJugada == Persona){
                                     do
                                     {
-                                        movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                                        movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Computadora;
+                                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                         if(jugador.cartasMazo != NULL){
                                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                             ultimoEnRealizarJugada = Persona;
+                                            vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                         }
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }else{
@@ -133,8 +139,10 @@ int main (){
                                     {   
                                         seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Persona;                                     
-                                        movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+                                        movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Computadora;
+                                        vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }
                             }
@@ -148,19 +156,22 @@ int main (){
                             do
                             {
                                 if(reparte == 0){
-                                    movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                                    movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Computadora;
+                                    vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                     seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Persona;
+                                    vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                 }else{
                                     seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Persona;
-                                    movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,&ultimoEnRecogerPorEmparejamiento);
+                                    vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+                                    movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Computadora;
+                                    vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                                 }
                                 contadorCartasJugador--;
                                 contadorCartasComputadora--;
-                            vaciarInformacion(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
                             } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                         }
                         asignarCartasSobrantes(cartasMesa,jugador,computadora,ultimoEnRecogerPorEmparejamiento);
