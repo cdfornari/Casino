@@ -800,29 +800,24 @@ bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaCo
 int emparejarMultiplesCartas(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Nodo *&cartasQueSeEmparejan){
     insertarCartaEnMazo(mesa,cartaAEmparejar);
     eliminarCartaDeMazo(mazoJugador,cartaAEmparejar);
-    Nodo *auxiliar = mesa;
     int idExistente = 0;
+    Nodo *auxiliar = cartasQueSeEmparejan;
     while(auxiliar != NULL){
         if(auxiliar->carta.idEmparejamiento != 0){
             idExistente = auxiliar->carta.idEmparejamiento;
             break;
         }
+        auxiliar = auxiliar->siguiente;
     }
-    int sumaEmparejadas = cartaAEmparejar.valor;
-    auxiliar = cartasQueSeEmparejan;
-    while(auxiliar != NULL)
-        sumaEmparejadas = sumaEmparejadas + auxiliar->carta.valor;
     int id;
     if (idExistente == 0)
         id = generarIdEmparejamiento();
     else
         id = idExistente;
-    auxiliar = mesa;
-    while (auxiliar != NULL){
-        if ((auxiliar->carta.valor == cartaAEmparejar.valor && auxiliar->carta.figura == cartaAEmparejar.figura)){
-            auxiliar->carta.idEmparejamiento = id;
-            auxiliar->carta.sumaEmparejadas = sumaEmparejadas;  
-        }    
+    int sumaEmparejadas = cartaAEmparejar.valor;
+    auxiliar = cartasQueSeEmparejan;
+    while(auxiliar != NULL){
+        sumaEmparejadas = sumaEmparejadas + auxiliar->carta.valor;
         auxiliar = auxiliar->siguiente;
     }
     auxiliar = mesa;
@@ -967,7 +962,6 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
             }
             //determinar suma total de la seleccion
             int sumaTotal = sumaEmparejadas + cartaAEmparejar.valor;
-            auxiliar = cartasQueSeEmparejan;
             //Al valor acumulado del emparejamiento sumarle el valor de las cartas seleccionadas que no estan emparejadas y la que usa el jugador
             auxiliar = cartasQueSeEmparejan;
             while (auxiliar != NULL)
