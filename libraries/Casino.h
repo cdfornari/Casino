@@ -176,7 +176,7 @@ Carta buscarCarta(Nodo *mazo, Carta cartaABuscar){
             return carta;
         mazo=mazo->siguiente;
     }
-    carta.valor=-1; //Si no la encuentra, retorna una carta con valor -1.
+    carta.valor = -1; //Si no la encuentra, retorna una carta con valor -1.
     return carta;
 }
 
@@ -709,12 +709,13 @@ bool multiplesCartasPuedenRecogerse(Carta cartaConLaQueSeRecoge, Nodo *cartasQue
     
 }
 
-void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja){
+int emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja){
     insertarCartaEnMazo(mesa,cartaAEmparejar);
     eliminarCartaDeMazo(mazoJugador,cartaAEmparejar);
     Nodo *auxiliar = mesa;
+    int id;
     if(cartaConLaQueSeEmpareja.idEmparejamiento == 0){
-        int id = generarIdEmparejamiento();
+        id = generarIdEmparejamiento();
         while (auxiliar != NULL){
             if ((auxiliar->carta.valor == cartaAEmparejar.valor && auxiliar->carta.figura == cartaAEmparejar.figura) || (auxiliar->carta.valor == cartaConLaQueSeEmpareja.valor && auxiliar->carta.figura == cartaConLaQueSeEmpareja.figura)){
                 auxiliar->carta.idEmparejamiento = id;
@@ -732,7 +733,9 @@ void emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Cart
             }
             auxiliar = auxiliar->siguiente;
         }
+        id = cartaConLaQueSeEmpareja.idEmparejamiento;
     }
+    return id;
 }
 
 bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaConLaQueSeEmpareja, Nodo *mesa, bool mostrarMensajeDeError){
@@ -769,7 +772,7 @@ bool cartaPuedeEmparejarse(Jugador jugador, Carta cartaAEmparejar, Carta cartaCo
     return true;
 }
 
-void emparejarMultiplesCartas(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Nodo *&cartasQueSeEmparejan){
+int emparejarMultiplesCartas(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Nodo *&cartasQueSeEmparejan){
     insertarCartaEnMazo(mesa,cartaAEmparejar);
     eliminarCartaDeMazo(mazoJugador,cartaAEmparejar);
     Nodo *auxiliar = mesa;
@@ -806,6 +809,7 @@ void emparejarMultiplesCartas(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmpar
         }
         auxiliar = auxiliar->siguiente;
     }
+    return id;
 }
 
 bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEmparejan, Jugador jugador, bool mostrarMensajeDeError){
@@ -964,13 +968,14 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
     }
 }
 
-void doblarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla){
+int doblarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla){
     insertarCartaEnMazo(mesa,cartaADoblar);
     eliminarCartaDeMazo(mazoJugador,cartaADoblar);
     Nodo *auxiliar = mesa;
+    int id;
     if(cartaConLaQueSeDobla.idEmparejamiento == 0)
     {
-        int id = generarIdEmparejamiento();
+        id = generarIdEmparejamiento();
         while (auxiliar != NULL){
             if (auxiliar->carta.valor == cartaADoblar.valor && auxiliar->carta.figura == cartaADoblar.figura){ //si es la carta que se usa para doblar
                 auxiliar->carta.doblada = true;
@@ -996,7 +1001,9 @@ void doblarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaADoblar, Carta cart
             }
             auxiliar = auxiliar->siguiente;
         }
+        id = cartaConLaQueSeDobla.idEmparejamiento;
     }
+    return id;
 }
 
 bool cartaPuedeDoblarse(Jugador jugador, Carta cartaADoblar, Carta cartaConLaQueSeDobla, Nodo *mesa, bool mostrarMensajeDeError){
@@ -1118,8 +1125,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                     {
                         if((*cartaMesaSeleccionada).idEmparejamiento != 0 && (*cartaMesaSeleccionada).idEmparejamiento == (*computadora).idEmparejamiento)
                             computadora->idEmparejamiento = 0;
-                        emparejarCarta(mesa,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
-                        jugador->idEmparejamiento = cartaMesaSeleccionada->idEmparejamiento;
+                        jugador->idEmparejamiento = emparejarCarta(mesa,cartasJugador,cartaSeleccionada,*cartaMesaSeleccionada);
                         cout << "El jugador emparejo su carta ";
                         imprimirCarta(cartaSeleccionada);
                         cout << " con la carta de la mesa ";
@@ -1164,8 +1170,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                             }
                             auxiliar = auxiliar->siguiente;           
                         }
-                        emparejarMultiplesCartas(mesa,cartasJugador,cartaSeleccionada,cartasParaEmparejar);
-                        jugador->idEmparejamiento = cartasParaEmparejar->carta.idEmparejamiento;
+                        jugador->idEmparejamiento = emparejarMultiplesCartas(mesa,cartasJugador,cartaSeleccionada,cartasParaEmparejar);
                         cout << "El jugador emparejo su carta ";
                         imprimirCarta(cartaSeleccionada);
                         cout << " con las cartas de la mesa ";
@@ -1276,8 +1281,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                 *cartaMesaSeleccionada = buscarCartaPorPosicion(mesa,*posicionCartaDeMesa);
                 if (cartaPuedeDoblarse(*jugador,cartaSeleccionada,*cartaMesaSeleccionada,mesa,true))
                 {
-                    doblarCarta(mesa,jugador->cartasMazo,cartaSeleccionada,*cartaMesaSeleccionada);
-                    jugador->idEmparejamiento = cartaMesaSeleccionada->idEmparejamiento;
+                    jugador->idEmparejamiento = doblarCarta(mesa,jugador->cartasMazo,cartaSeleccionada,*cartaMesaSeleccionada);
                     cout << "El jugador doblo la carta de la mesa ";
                     imprimirCarta(*cartaMesaSeleccionada);
                     cout << " con su carta ";
