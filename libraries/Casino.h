@@ -931,7 +931,7 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
             }
             if(sumaQueSeEmpareja > 10){
                 if(mostrarMensajeDeError)
-                    cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                    cout << "La suma de las cartas seleccionadas supera el valor de 10" << endl;
                 return false;
             }
             return true;
@@ -966,9 +966,9 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                 return false;
             }
             //determinar suma total de la seleccion
-            int sumaTotal = sumaEmparejadas;
+            int sumaTotal = sumaEmparejadas + cartaAEmparejar.valor;
             auxiliar = cartasQueSeEmparejan;
-            //Al valor acumulado del emparejamiento sumarle el valor de las cartas seleccionadas que no estan emparejadas
+            //Al valor acumulado del emparejamiento sumarle el valor de las cartas seleccionadas que no estan emparejadas y la que usa el jugador
             auxiliar = cartasQueSeEmparejan;
             while (auxiliar != NULL)
             {
@@ -978,7 +978,7 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
             }
             if(sumaTotal > 10){
                 if(mostrarMensajeDeError)
-                    cout << "La suma de las cartas seleccionadas superan el valor de 10" << endl;
+                    cout << "La suma de las cartas a emparejar superan el valor de 10" << endl;
                 return false;
             }
             Carta cartaABuscar;
