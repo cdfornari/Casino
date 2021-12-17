@@ -742,10 +742,13 @@ int emparejarCarta(Nodo *&mesa, Nodo *&mazoJugador, Carta cartaAEmparejar, Carta
     if(cartaConLaQueSeEmpareja.idEmparejamiento == 0){
         id = generarIdEmparejamiento();
         while (auxiliar != NULL){
-            if ((auxiliar->carta.valor == cartaAEmparejar.valor && auxiliar->carta.figura == cartaAEmparejar.figura) || (auxiliar->carta.valor == cartaConLaQueSeEmpareja.valor && auxiliar->carta.figura == cartaConLaQueSeEmpareja.figura)){
+            if (auxiliar->carta.valor == cartaAEmparejar.valor && auxiliar->carta.figura == cartaAEmparejar.figura){
                 auxiliar->carta.idEmparejamiento = id;
                 auxiliar->carta.sumaEmparejadas = cartaConLaQueSeEmpareja.valor + auxiliar->carta.valor;  
-            }    
+            }else if(auxiliar->carta.valor == cartaConLaQueSeEmpareja.valor && auxiliar->carta.figura == cartaConLaQueSeEmpareja.figura){
+                auxiliar->carta.idEmparejamiento = id;
+                auxiliar->carta.sumaEmparejadas = cartaAEmparejar.valor + auxiliar->carta.valor;
+            } 
             auxiliar = auxiliar->siguiente;
         }
     }else{
@@ -960,9 +963,8 @@ bool multiplesCartasPuedenEmparejarse(Carta cartaAEmparejar, Nodo *cartasQueSeEm
                     cout << "No estan seleccionadas todas las cartas de un emparejamiento" << endl;
                 return false;
             }
-            //determinar suma total de la seleccion
-            int sumaTotal = sumaEmparejadas + cartaAEmparejar.valor;
             //Al valor acumulado del emparejamiento sumarle el valor de las cartas seleccionadas que no estan emparejadas y la que usa el jugador
+            int sumaTotal = sumaEmparejadas + cartaAEmparejar.valor;
             auxiliar = cartasQueSeEmparejan;
             while (auxiliar != NULL)
             {
@@ -1565,7 +1567,7 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
             if (cartaPuedeEmparejarse(computadora,cartaSeleccionada,cartaMesaSeleccionada,mesa,false)){
                 if(cartaMesaSeleccionada.idEmparejamiento != 0 && cartaMesaSeleccionada.idEmparejamiento == jugador.idEmparejamiento) 
                     jugador.idEmparejamiento = 0;  
-                    computadora.idEmparejamiento=emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
+                    computadora.idEmparejamiento = emparejarCarta(mesa, mazoComputadora, cartaSeleccionada, cartaMesaSeleccionada);
                     cout<<"La computadora emparejo la carta ";
                     imprimirCarta(cartaSeleccionada);
                     cout<< " con la carta de la mesa ";
