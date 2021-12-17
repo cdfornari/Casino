@@ -34,7 +34,7 @@ int main (){
         limpiarConsola(isMac);
         switch (opcionSeleccionada)
         {
-            case '1':
+            case '1': //Jugar
                 srand(time(0));
                 barajear(mazo);
                 repartirAMesa(mazo,cartasMesa);
@@ -62,7 +62,6 @@ int main (){
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Persona;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
-
                         }else{
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Persona;
@@ -81,7 +80,7 @@ int main (){
                 contarPuntaje(jugador.cartasRecogidas,computadora.cartasRecogidas,jugador.clarezas,computadora.clarezas);
                 reiniciarValores(mazo, cartasMesa, jugador, computadora, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);   
                 vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok); break;
-            case '2':
+            case '2': //partida anterior
                     if(existeArchivo()){
                         cargarInformacion(mazo, cartasMesa, jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada);
                         cout<<"\nPartida cargada\n";
@@ -95,12 +94,12 @@ int main (){
                             contadorCartasJugador = contarCartas(jugador.cartasMazo);
                             contadorCartasComputadora = contarCartas(computadora.cartasMazo);
                         }
-                        if(ultimoEnRealizarJugada != Null){
-                            if (reparte == 0)
+                        if(ultimoEnRealizarJugada != Null){ //si se quedo en medio de una ronda, completarla (turno 2, 3 o 4)
+                            if (reparte == 0) //reparte jugador
                             {
-                                if(ultimoEnRealizarJugada == Persona){
+                                if(ultimoEnRealizarJugada == Persona){ //el orden depende del ultimo que haya hecho un movimiento
                                     do
-                                    {
+                                    {   //quedan 2 movimientos
                                         movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Computadora;
                                         vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -114,7 +113,7 @@ int main (){
                                         seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Persona;
                                         vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
-                                        if(computadora.cartasMazo != NULL){
+                                        if(computadora.cartasMazo != NULL){  //pudo haber quedado en el ultimo movimiento de la ronda o faltan 3 turnos
                                             movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                             ultimoEnRealizarJugada = Computadora;
                                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -122,15 +121,15 @@ int main (){
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }
                             }
-                            else
+                            else //reparte computadora
                             {
-                                if(ultimoEnRealizarJugada == Persona){
+                                if(ultimoEnRealizarJugada == Persona){  //el orden depende del ultimo que haya hecho un movimiento
                                     do
-                                    {
+                                    {   
                                         movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Computadora;
                                         vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
-                                        if(jugador.cartasMazo != NULL){
+                                        if(jugador.cartasMazo != NULL){  //pudo haber quedado en el ultimo movimiento de la ronda o faltan 3 turnos
                                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                             ultimoEnRealizarJugada = Persona;
                                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -138,7 +137,7 @@ int main (){
                                     } while (jugador.cartasMazo != NULL || computadora.cartasMazo!= NULL);
                                 }else{
                                     do
-                                    {   
+                                    {   //quedan 2 movimientos
                                         seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                         ultimoEnRealizarJugada = Persona;                                     
                                         vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -149,7 +148,7 @@ int main (){
                                 }
                             }
                         }
-                        while (mazo != NULL)
+                        while (mazo != NULL) //Continuar normalmente con las otras rondas
                         {
                             ultimoEnRealizarJugada = Null;
                             repartirCartas(mazo,jugador.cartasMazo,computadora.cartasMazo);
@@ -158,6 +157,8 @@ int main (){
                             do
                             {
                                 if(reparte == 0){
+                                    cout << "Cartas en la mesa:\n";
+                                    imprimirMazo(cartasMesa);
                                     movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Computadora;
                                     vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -168,6 +169,8 @@ int main (){
                                     seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Persona;
                                     vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+                                    cout << "Cartas en la mesa:\n";
+                                    imprimirMazo(cartasMesa);
                                     movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                                     ultimoEnRealizarJugada = Computadora;
                                     vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
