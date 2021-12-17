@@ -163,7 +163,7 @@ Carta buscarCartaEnMazoPorIdEmparejamiento(Nodo *mazo, int id){
         mazo=mazo->siguiente;
     }
     Carta noEncontrada;
-    noEncontrada.valor = NULL;
+    noEncontrada.valor = -1;
     return noEncontrada;
 }
 
@@ -372,7 +372,7 @@ void repartirAMesa(Nodo *&mazo, Nodo *&mesa){
 
 /******************* PUNTAJE ***********************/
 
-int contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora, int clarezasJugador, int clarezasComputadora){
+void contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora, int clarezasJugador, int clarezasComputadora){
     //contar cartas, espada y sumar puntaje de cada carta que e recogio
     int puntajeJugador = clarezasJugador;
     int contadorCartasJugador = 0;
@@ -503,7 +503,7 @@ void recogerCartaDeMesa(Nodo *&mesa, Nodo *&recogidas,Nodo *&mazoJugador, Carta 
         int *contador = new int(0);
         Carta carta; 
         //recoger todo el emparejamiento restante
-        while (buscarCartaEnMazoPorIdEmparejamiento(mesa,cartaQueSeRecoge.idEmparejamiento).valor != NULL)
+        while (buscarCartaEnMazoPorIdEmparejamiento(mesa,cartaQueSeRecoge.idEmparejamiento).valor != -1)
         {
             carta = buscarCartaEnMazoPorIdEmparejamiento(mesa,cartaQueSeRecoge.idEmparejamiento);
             insertarCartaEnMazo(recogidas,carta);
