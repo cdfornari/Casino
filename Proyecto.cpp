@@ -54,6 +54,8 @@ int main (){
                     do
                     {
                         if(reparte == 0){
+                            cout << "Cartas en la mesa:\n";
+                            imprimirMazo(cartasMesa);
                             movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Computadora;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
@@ -65,6 +67,8 @@ int main (){
                             seleccionarMovimiento(&jugador,&computadora,cartasMesa,jugador.cartasMazo,jugador.cartasRecogidas,contadorCartasJugador,contadorCartasMesa,isMac,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Persona;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);
+                            cout << "Cartas en la mesa:\n";
+                            imprimirMazo(cartasMesa);
                             movimientosComputadora(cartasMesa,computadora.cartasMazo,computadora.cartasRecogidas,contadorCartasComputadora,*contadorCartasMesa,computadora,jugador,&ultimoEnRecogerPorEmparejamiento);
                             ultimoEnRealizarJugada = Computadora;
                             vaciarEnArchivo(mazo, cartasMesa,  jugador, computadora, reparte, ultimoEnRecogerPorEmparejamiento, ultimoEnRealizarJugada, ok);

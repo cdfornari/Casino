@@ -216,157 +216,6 @@ Carta buscarCartaPorFigura(Nodo *mazo, Figuras figuraABuscar){
     return carta;
 }
 
-/******************* FUNCIONES DEL JUEGO ***********************/
-
-void barajear(Nodo *&mazo){
-    Carta carta;
-    for (int i = 1; i <= 52; i++)
-    {
-        do
-        {
-            carta = generarCarta();
-        } while (cartaExisteEnMazo(mazo,carta));
-        insertarCartaEnMazo(mazo,carta);
-    }
-}
-
-void repartirCartas(Nodo *&mazo, Nodo *&cartasJugador, Nodo *&cartasComputadora){
-    short int *contadorCartas = new short int(0);
-    Nodo *auxiliar = mazo;
-    while(auxiliar != NULL && *contadorCartas < 4){
-        insertarCartaEnMazo(cartasJugador,auxiliar->carta);
-        eliminarCartaDeMazo(mazo,auxiliar->carta);
-        auxiliar = auxiliar->siguiente;
-        insertarCartaEnMazo(cartasComputadora,auxiliar->carta);
-        eliminarCartaDeMazo(mazo,auxiliar->carta);
-        auxiliar = auxiliar->siguiente;
-        (*contadorCartas)++;
-    }
-    delete contadorCartas;
-}
-
-void repartirAMesa(Nodo *&mazo, Nodo *&mesa){
-    short int *contadorCartas = new short int(0);
-    Nodo *auxiliar = mazo;
-    while(auxiliar != NULL && *contadorCartas < 4){
-        insertarCartaEnMazo(mesa,auxiliar->carta);
-        eliminarCartaDeMazo(mazo,auxiliar->carta);
-        auxiliar = auxiliar->siguiente;
-        (*contadorCartas)++;
-    }
-    delete contadorCartas;
-}
-
-/******************* PUNTAJE ***********************/
-
-int contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora, int clarezasJugador, int clarezasComputadora){
-    int puntajeJugador = clarezasJugador;
-    int contadorCartasJugador = 0;
-    int contadorEspadasJugador = 0;
-    Nodo *auxiliar = cartasRecogidasJugador;
-    while (auxiliar != NULL){
-        contadorCartasJugador++;
-        puntajeJugador = puntajeJugador + auxiliar->carta.puntaje;
-        if (auxiliar->carta.figura == espada)
-            contadorEspadasJugador++;
-        auxiliar = auxiliar->siguiente;
-    }
-    int puntajeComputadora = clarezasComputadora;
-    int contadorCartasComputadora = 0;
-    int contadorEspadasComputadora = 0;
-    Nodo *auxiliar = cartasRecogidasComputadora;
-    while (auxiliar != NULL){
-        contadorCartasComputadora++;
-        puntajeComputadora = puntajeComputadora + auxiliar->carta.puntaje;
-        if (auxiliar->carta.figura == espada)
-            contadorEspadasComputadora++;
-        auxiliar = auxiliar->siguiente;
-    }
-    if(contadorCartasJugador == contadorCartasComputadora){
-        if(contadorEspadasJugador > contadorEspadasComputadora)
-            puntajeJugador = puntajeJugador + 3;
-        else
-            puntajeComputadora = puntajeComputadora + 3;
-    }else{
-        if (contadorCartasJugador > contadorCartasComputadora)
-            puntajeJugador = puntajeJugador + 3;
-        else
-            puntajeComputadora = puntajeComputadora + 3;
-        if(contadorEspadasJugador > contadorEspadasComputadora)
-            puntajeJugador++;
-        else
-            puntajeComputadora++;
-    }
-    if(puntajeJugador == puntajeComputadora)
-        cout << "EMPATE\n";
-    else
-        if(puntajeJugador > puntajeComputadora)
-            cout << "GANO JUGADOR\n";
-        else
-            cout << "GANO COMPUTADORA\n";
-    cout << "Puntaje del jugador: " << puntajeJugador << endl;
-    cout << "Numero de cartas recogidas: " << contadorCartasJugador << endl;
-    cout << "Numero de espadas recogidas: " << contadorEspadasJugador << endl;
-    cout << "Numero de clarezas: " << clarezasJugador << endl;
-    cout << "Cartas recogidas: " << endl;
-    imprimirMazo(cartasRecogidasJugador);
-    cout << endl;
-    cout << "Puntaje de la computadora: " << puntajeComputadora << endl;
-    cout << "Numero de cartas recogidas: " << contadorCartasComputadora << endl;
-    cout << "Numero de espadas recogidas: " << contadorEspadasComputadora << endl;
-    cout << "Numero de clarezas: " << clarezasComputadora << endl;
-    cout << "Cartas recogidas: " << endl;
-    imprimirMazo(cartasRecogidasComputadora);
-    cout << endl;
-}
-
-void asignarCartasSobrantes(Nodo *&mesa, Jugador &jugador, Jugador &computadora, Ultimo ultimoEnRecogerPorEmparejamiento){
-    if(mesa != NULL)
-        switch (ultimoEnRecogerPorEmparejamiento)
-        {
-            case Persona:
-                cout << "El jugador fue el ultimo en recoger por emparejamiento, se le asignarion las cartas restantes de la mesa" << endl;
-                imprimirMazo(mesa);
-                cout << endl;
-                while (mesa != NULL)
-                {
-                    insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
-                    eliminarCartaDeMazo(mesa,mesa->carta);
-                }
-            break;
-            case Computadora:
-                cout << "La computadora fue la ultima en recoger por emparejamiento, se le asignarion las cartas restantes de la mesa" << endl;
-                imprimirMazo(mesa);
-                cout << endl;
-                while (mesa != NULL)
-                {
-                    insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
-                    eliminarCartaDeMazo(mesa,mesa->carta);
-                }
-            break;
-            default:
-                cout << "Nadie recogio por emparejamiento, se asignaron las cartas equitativamente (si sobra una se asigna con 50% de probabilidad para uno de los 2)" << endl;
-                imprimirMazo(mesa);
-                cout << endl;
-                while (mesa != NULL && contarCartas(mesa) > 1)
-                {
-                    insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
-                    eliminarCartaDeMazo(mesa,mesa->carta);
-                    insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
-                    eliminarCartaDeMazo(mesa,mesa->carta);
-                }
-                if(contarCartas(mesa) == 1)
-                    if (rand()%2 == 0){
-                        insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
-                        eliminarCartaDeMazo(mesa,mesa->carta);
-                    }else{
-                        insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
-                        eliminarCartaDeMazo(mesa,mesa->carta);
-                    }
-            break;
-        }
-}
-
 /******************* IMPRIMIR ***********************/
 
 void imprimirFigura (Carta carta){
@@ -477,6 +326,157 @@ void imprimirCartasPorPosicion(Nodo *cartasJugador){
         (*contador)++; 
     }
     delete contador;
+}
+
+/******************* FUNCIONES DEL JUEGO ***********************/
+
+void barajear(Nodo *&mazo){
+    Carta carta;
+    for (int i = 1; i <= 52; i++)
+    {
+        do
+        {
+            carta = generarCarta();
+        } while (cartaExisteEnMazo(mazo,carta));
+        insertarCartaEnMazo(mazo,carta);
+    }
+}
+
+void repartirCartas(Nodo *&mazo, Nodo *&cartasJugador, Nodo *&cartasComputadora){
+    short int *contadorCartas = new short int(0);
+    Nodo *auxiliar = mazo;
+    while(auxiliar != NULL && *contadorCartas < 4){
+        insertarCartaEnMazo(cartasJugador,auxiliar->carta);
+        eliminarCartaDeMazo(mazo,auxiliar->carta);
+        auxiliar = auxiliar->siguiente;
+        insertarCartaEnMazo(cartasComputadora,auxiliar->carta);
+        eliminarCartaDeMazo(mazo,auxiliar->carta);
+        auxiliar = auxiliar->siguiente;
+        (*contadorCartas)++;
+    }
+    delete contadorCartas;
+}
+
+void repartirAMesa(Nodo *&mazo, Nodo *&mesa){
+    short int *contadorCartas = new short int(0);
+    Nodo *auxiliar = mazo;
+    while(auxiliar != NULL && *contadorCartas < 4){
+        insertarCartaEnMazo(mesa,auxiliar->carta);
+        eliminarCartaDeMazo(mazo,auxiliar->carta);
+        auxiliar = auxiliar->siguiente;
+        (*contadorCartas)++;
+    }
+    delete contadorCartas;
+}
+
+/******************* PUNTAJE ***********************/
+
+int contarPuntaje(Nodo *cartasRecogidasJugador, Nodo *cartasRecogidasComputadora, int clarezasJugador, int clarezasComputadora){
+    int puntajeJugador = clarezasJugador;
+    int contadorCartasJugador = 0;
+    int contadorEspadasJugador = 0;
+    Nodo *auxiliar = cartasRecogidasJugador;
+    while (auxiliar != NULL){
+        contadorCartasJugador++;
+        puntajeJugador = puntajeJugador + auxiliar->carta.puntaje;
+        if (auxiliar->carta.figura == espada)
+            contadorEspadasJugador++;
+        auxiliar = auxiliar->siguiente;
+    }
+    int puntajeComputadora = clarezasComputadora;
+    int contadorCartasComputadora = 0;
+    int contadorEspadasComputadora = 0;
+    auxiliar = cartasRecogidasComputadora;
+    while (auxiliar != NULL){
+        contadorCartasComputadora++;
+        puntajeComputadora = puntajeComputadora + auxiliar->carta.puntaje;
+        if (auxiliar->carta.figura == espada)
+            contadorEspadasComputadora++;
+        auxiliar = auxiliar->siguiente;
+    }
+    if(contadorCartasJugador == contadorCartasComputadora){
+        if(contadorEspadasJugador > contadorEspadasComputadora)
+            puntajeJugador = puntajeJugador + 3;
+        else
+            puntajeComputadora = puntajeComputadora + 3;
+    }else{
+        if (contadorCartasJugador > contadorCartasComputadora)
+            puntajeJugador = puntajeJugador + 3;
+        else
+            puntajeComputadora = puntajeComputadora + 3;
+        if(contadorEspadasJugador > contadorEspadasComputadora)
+            puntajeJugador++;
+        else
+            puntajeComputadora++;
+    }
+    if(puntajeJugador == puntajeComputadora)
+        cout << "EMPATE\n";
+    else
+        if(puntajeJugador > puntajeComputadora)
+            cout << "GANO JUGADOR\n";
+        else
+            cout << "GANO COMPUTADORA\n";
+    cout << "Puntaje del jugador: " << puntajeJugador << endl;
+    cout << "Numero de cartas recogidas: " << contadorCartasJugador << endl;
+    cout << "Numero de espadas recogidas: " << contadorEspadasJugador << endl;
+    cout << "Numero de clarezas: " << clarezasJugador << endl;
+    cout << "Cartas recogidas: " << endl;
+    imprimirMazo(cartasRecogidasJugador);
+    cout << endl;
+    cout << "Puntaje de la computadora: " << puntajeComputadora << endl;
+    cout << "Numero de cartas recogidas: " << contadorCartasComputadora << endl;
+    cout << "Numero de espadas recogidas: " << contadorEspadasComputadora << endl;
+    cout << "Numero de clarezas: " << clarezasComputadora << endl;
+    cout << "Cartas recogidas: " << endl;
+    imprimirMazo(cartasRecogidasComputadora);
+    cout << endl;
+}
+
+void asignarCartasSobrantes(Nodo *&mesa, Jugador &jugador, Jugador &computadora, Ultimo ultimoEnRecogerPorEmparejamiento){
+    if(mesa != NULL)
+        switch (ultimoEnRecogerPorEmparejamiento)
+        {
+            case Persona:
+                cout << "El jugador fue el ultimo en recoger por emparejamiento, se le asignarion las cartas restantes de la mesa" << endl;
+                imprimirMazo(mesa);
+                cout << endl;
+                while (mesa != NULL)
+                {
+                    insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                }
+            break;
+            case Computadora:
+                cout << "La computadora fue la ultima en recoger por emparejamiento, se le asignarion las cartas restantes de la mesa" << endl;
+                imprimirMazo(mesa);
+                cout << endl;
+                while (mesa != NULL)
+                {
+                    insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                }
+            break;
+            default:
+                cout << "Nadie recogio por emparejamiento, se asignaron las cartas equitativamente (si sobra una se asigna con 50% de probabilidad para uno de los 2)" << endl;
+                imprimirMazo(mesa);
+                cout << endl;
+                while (mesa != NULL && contarCartas(mesa) > 1)
+                {
+                    insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                    insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
+                    eliminarCartaDeMazo(mesa,mesa->carta);
+                }
+                if(contarCartas(mesa) == 1)
+                    if (rand()%2 == 0){
+                        insertarCartaEnMazo(jugador.cartasRecogidas,mesa->carta);
+                        eliminarCartaDeMazo(mesa,mesa->carta);
+                    }else{
+                        insertarCartaEnMazo(computadora.cartasRecogidas,mesa->carta);
+                        eliminarCartaDeMazo(mesa,mesa->carta);
+                    }
+            break;
+        }
 }
 
 /******************* ACCIONES Y VALIDACIONES JUGADOR ***********************/
@@ -1098,10 +1098,10 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
         cout << "Cartas en la mesa:\n";
         imprimirMazo(mesa);
         imprimirEmparejamientos(mesa);
-        cout << "\nQue jugada quiere realizar?" << endl;
+        cout << "Que jugada quiere realizar?" << endl;
         cout << "1. Lanzar carta en mesa" << endl;
         cout << "2. Emparejar una o varias cartas" << endl;
-        cout << "3. Recoger una carta o varias cartas o un emparejamiento" << endl;
+        cout << "3. Recoger una carta, varias cartas o un emparejamiento" << endl;
         cout << "4. Doblar o proteger carta o emparejamiento" << endl;
         *opcionSeleccionada = seleccionarOpcion();
         limpiarConsola(isMac);
@@ -1153,6 +1153,16 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         imprimirCarta(*cartaMesaSeleccionada);
                         if(cartaMesaSeleccionada->idEmparejamiento != 0)
                             cout << " (incluyendo a sus emparejadas)";
+                        int suma;
+                        Nodo *auxiliar = mesa;
+                        while (auxiliar != NULL){
+                            if(auxiliar->carta.idEmparejamiento == jugador->idEmparejamiento){
+                                suma = auxiliar->carta.sumaEmparejadas;
+                                break;
+                            }
+                            auxiliar = auxiliar->siguiente;
+                        }
+                        cout << " para sumar " << suma;
                         cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         *movimientoValido = true;
@@ -1196,6 +1206,16 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         imprimirCarta(cartaSeleccionada);
                         cout << " con las cartas de la mesa ";
                         imprimirMazo(cartasParaEmparejar);
+                        int suma;
+                        auxiliar = mesa;
+                        while (auxiliar != NULL){
+                            if(auxiliar->carta.idEmparejamiento == jugador->idEmparejamiento){
+                                suma = auxiliar->carta.sumaEmparejadas;
+                                break;
+                            }
+                            auxiliar = auxiliar->siguiente;
+                        }
+                        cout << "Para sumar " << suma;
                         cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         *movimientoValido = true;
@@ -1238,7 +1258,7 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                         cout << " con su carta ";
                         imprimirCarta(cartaSeleccionada);
                         if(cartaMesaSeleccionada->idEmparejamiento != 0)
-                            cout << " (incluyendo a sus emparejadas)";
+                            cout << " (incluyendo a sus emparejadas), que suman " << cartaSeleccionada.valor;
                         cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
                         if(*contadorCartasMesa == 0){
@@ -1281,10 +1301,10 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                             }
                             auxiliar = auxiliar->siguiente;
                         }
-                        recogerVariasCartasDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,cartasParaRecoger);
                         cout << "El jugador recogio las cartas de la mesa ";
                         imprimirMazo(cartasParaRecoger);
-                        cout << " con su carta ";
+                        recogerVariasCartasDeMesa(mesa,recogidasJugador,cartasJugador,cartaSeleccionada,cartasParaRecoger);
+                        cout << "Con su carta ";
                         imprimirCarta(cartaSeleccionada);
                         cout << endl;
                         *contadorCartasMesa = contarCartas(mesa);
@@ -1312,7 +1332,17 @@ void seleccionarMovimiento(Jugador *jugador, Jugador *computadora, Nodo *&mesa, 
                     cout << " con su carta ";
                     imprimirCarta(cartaSeleccionada);
                     if(cartaMesaSeleccionada->idEmparejamiento != 0)
-                        cout << " (incluyendo a sus emparejadas)";
+                        cout << " (incluyendo a sus emparejadas), que suman " << cartaSeleccionada.valor;
+                    Nodo *auxiliar = mesa;
+                    int suma;
+                    while (auxiliar != NULL){
+                        if(auxiliar->carta.idEmparejamiento == jugador->idEmparejamiento){
+                            suma = auxiliar->carta.sumaEmparejadas;
+                            break;
+                        }
+                        auxiliar = auxiliar->siguiente;
+                    }
+                    cout << "para sumar " << suma;
                     cout << endl;
                     *contadorCartasMesa = contarCartas(mesa);
                     *movimientoValido = true;
