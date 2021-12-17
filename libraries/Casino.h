@@ -437,7 +437,7 @@ void asignarCartasSobrantes(Nodo *&mesa, Jugador &jugador, Jugador &computadora,
         switch (ultimoEnRecogerPorEmparejamiento)
         {
             case Persona:
-                cout << "El jugador fue el ultimo en recoger por emparejamiento, se le asignarion las cartas restantes de la mesa" << endl;
+                cout << "El jugador fue el ultimo en recoger por emparejamiento, se le asignaron las cartas restantes de la mesa" << endl;
                 imprimirMazo(mesa);
                 cout << endl;
                 while (mesa != NULL)
@@ -447,7 +447,7 @@ void asignarCartasSobrantes(Nodo *&mesa, Jugador &jugador, Jugador &computadora,
                 }
             break;
             case Computadora:
-                cout << "La computadora fue la ultima en recoger por emparejamiento, se le asignarion las cartas restantes de la mesa" << endl;
+                cout << "La computadora fue la ultima en recoger por emparejamiento, se le asignaron las cartas restantes de la mesa" << endl;
                 imprimirMazo(mesa);
                 cout << endl;
                 while (mesa != NULL)
@@ -1479,7 +1479,7 @@ void recogerPorCartaEspecifica(Figuras figuraARecoger, int valorARecoger, Nodo *
         }      
 }
 //Funcion que realiza todas las sumas posibles que puede recoger la computadora
-void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &movimientoRealizado){
+void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, Jugador &computadora, bool &movimientoRealizado){
     int suma=0, cantidadCartas=0;
     bool ok=false;
     Carta carta, cartaDelMazo, cartaABuscar;
@@ -1511,6 +1511,10 @@ void recogerSumasComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogid
             cout<< " la suma de las siguientes cartas: ";
             imprimirMazo(listaAuxiliar);
             cout<<"\n";
+            if(contarCartas(mesa)==0){
+                ++computadora.clarezas;
+                cout << "La computadora anoto Clareza" << endl;
+            }
             movimientoRealizado=true;
             break;
         }
@@ -1578,7 +1582,7 @@ void recogerCartas(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas, bool &
                 recogerPorFigura(espada,mesa, recogidas,mazoComputadora, computadora, movimientoRealizado);
             break;
             case 6:
-                recogerSumasComputadora(mesa, mazoComputadora, recogidas, movimientoRealizado);
+                recogerSumasComputadora(mesa, mazoComputadora, recogidas, computadora, movimientoRealizado);
             break;      
             default:
                 recogerUnaCarta(mesa, mazoComputadora, recogidas, movimientoRealizado, computadora);
@@ -1602,7 +1606,9 @@ void emparejarComputadora(Nodo *&mesa, Nodo *&mazoComputadora, Nodo *&recogidas,
                     imprimirCarta(cartaSeleccionada);
                     cout<< " con la carta de la mesa ";
                     imprimirCarta(cartaMesaSeleccionada);
-                    cout<<"\n";
+                    cartaConId=buscarCartaEspecifica(mesa, cartaSeleccionada);
+                    cout << " para sumar " << cartaConId.sumaEmparejadas;
+                    cout << endl;
                     movimientoRealizado=true;
                     break;
                 }
